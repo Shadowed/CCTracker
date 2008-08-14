@@ -22,6 +22,7 @@ function PartyCC:OnInitialize()
 			showName = false,
 			enableSync = true,
 			silent = false,
+			growUp = true,
 			
 			disabled = {},
 			spells = {},
@@ -46,6 +47,7 @@ function PartyCC:OnInitialize()
 	GTBGroup:SetWidth(self.db.profile.width)
 	GTBGroup:SetDisplayGroup(self.db.profile.redirectTo ~= "" and self.db.profile.redirectTo or nil)
 	GTBGroup:SetAnchorVisible(self.db.profile.showAnchor)
+	GTBGroup:SetBarGrowth(self.db.profile.growUp and "UP" or "DOWN")
 
 	if( self.db.profile.position ) then
 		GTBGroup:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", self.db.profile.position.x, self.db.profile.position.y)
@@ -222,7 +224,7 @@ end
 -- Debuff faded
 function PartyCC:DebuffFaded(spellID, destName, destGUID)
 	local spellName = GetSpellInfo(spellID)
-	if( activeTimers[destGUID][spellName] ) then
+	if( activeTimers[destGUID] and activeTimers[destGUID][spellName] ) then
 		GTBGroup:UnregisterBar(activeTimers[destGUID][spellName])
 	end
 end
@@ -375,6 +377,7 @@ function PartyCC:Reload()
 	GTBGroup:SetWidth(self.db.profile.width)
 	GTBGroup:SetDisplayGroup(self.db.profile.redirectTo ~= "" and self.db.profile.redirectTo or nil)
 	GTBGroup:SetAnchorVisible(self.db.profile.showAnchor)
+	GTBGroup:SetBarGrowth(self.db.profie.growUp and "UP" or "DOWN")
 end
 
 -- Manage GTB group

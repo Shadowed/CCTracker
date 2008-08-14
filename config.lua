@@ -164,6 +164,14 @@ local function loadOptions()
 				inline = true,
 				name = L["Bars"],
 				args = {
+					growUp = {
+						order = 0,
+						type = "toggle",
+						name = L["Grow display up"],
+						desc = L["Instead of adding everything from top to bottom, timers will be shown from bottom to top."],
+						width = "double",
+						arg = "growUp",
+					},
 					texture = {
 						order = 1,
 						type = "select",

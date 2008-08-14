@@ -38,6 +38,9 @@ PartyCCLocals = {
 	["Silent mode"] = "Silent mode",
 	["Disables all timers, all this does is sync your CCs with other players."] = "Disables all timers, all this does is sync your CCs with other players.",
 	
+	["Grow display up"] = "Grow display up",
+	["Instead of adding everything from top to bottom, timers will be shown from bottom to top."] = "Instead of adding everything from top to bottom, timers will be shown from bottom to top.",
+	
 	["Syncing"] = "Syncing",
 	
 	["Spells"] = "Spells",
