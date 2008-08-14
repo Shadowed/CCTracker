@@ -1,0 +1,28 @@
+## Interface: 20400
+## Title: Party CC Tracker (2)
+## Notes: Tracks party CC timers using both syncing and guessing methods
+## Author: Mayen
+## Version: $Revision: 666 $
+## SavedVariables: PartyCCDB
+## OptionalDeps: LibStub, GTB, DRData-1.0, Ace3
+
+libs\LibStub\LibStub.lua
+libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
+libs\AceAddon-3.0\AceAddon-3.0.xml
+libs\AceEvent-3.0\AceEvent-3.0.xml
+libs\AceDB-3.0\AceDB-3.0.xml
+libs\AceDBOptions-3.0\AceDBOptions-3.0.xml
+libs\AceGUI-3.0\AceGUI-3.0.xml
+libs\AceConfig-3.0\AceConfig-3.0.xml
+libs\LibSharedMedia-3.0\lib.xml
+libs\AceGUI-3.0-SharedMediaWidgets\widget.xml
+libs\GTB\GTB.xml
+libs\DRData-1.0\DRData-1.0.xml
+
+localization.enUS.lua
+localization.deDE.lua
+localization.frFR.lua
+
+spellData.lua
+PartyCCTracker2.lua
+config.lua
