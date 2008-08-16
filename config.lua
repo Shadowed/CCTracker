@@ -129,12 +129,12 @@ local function loadOptions()
 				width = "full",
 				arg = "showAnchor",
 			},
-			showName = {
+			nameOnly = {
 				order = 1,
 				type = "toggle",
 				name = L["Only show trigger name in bars"],
 				width = "full",
-				arg = "showName",
+				arg = "nameOnly",
 			},
 			sync = {
 				order = 2,

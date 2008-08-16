@@ -19,7 +19,7 @@ function PartyCC:OnInitialize()
 			redirectTo = "",
 			texture = "BantoBar",
 			showAnchor = false,
-			showName = false,
+			nameOnly = false,
 			enableSync = true,
 			silent = false,
 			growUp = true,
@@ -253,10 +253,10 @@ function PartyCC:FoundTimer(spellID, spellName, destName, destGUID, duration, ti
 	self.db.profile.spells[spellName] = true
 
 	local text
-	if( self.db.profile.showName ) then
+	if( not self.db.profile.nameOnly ) then
 		text = string.format("%s - %s", destName, spellName)
 	else
-		text = spellName
+		text = destName
 	end
 	
 	GTBGroup:RegisterBar(id, text, timeLeft, duration, icon)
@@ -377,7 +377,7 @@ function PartyCC:Reload()
 	GTBGroup:SetWidth(self.db.profile.width)
 	GTBGroup:SetDisplayGroup(self.db.profile.redirectTo ~= "" and self.db.profile.redirectTo or nil)
 	GTBGroup:SetAnchorVisible(self.db.profile.showAnchor)
-	GTBGroup:SetBarGrowth(self.db.profie.growUp and "UP" or "DOWN")
+	GTBGroup:SetBarGrowth(self.db.profile.growUp and "UP" or "DOWN")
 end
 
 -- Manage GTB group
