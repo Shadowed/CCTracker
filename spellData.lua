@@ -28,6 +28,10 @@ CCTrackerSpells = {
 	
 	-- Cyclone
 	[33786] = 6,
+	
+	--[[ PALADINS ]]--
+	-- Turn Evil
+	[10326] = 20,
 
 	--[[ MAGES ]]--
 	-- Polymorph
@@ -52,6 +56,12 @@ CCTrackerSpells = {
 	[1513] = 10,
 	[14326] = 15,
 	[14327] = 20,
+	
+	-- Wyvern Sting
+	[19386] = 12,
+	[24132] = 12,
+	[24133] = 12,
+	[27068] = 12,
 		
 	--[[ WARLOCKS ]]--
 	-- Banish
@@ -69,6 +79,12 @@ CCTrackerSpells = {
 	-- Howl of Terror
 	[5484] = 6,
 	[17928] = 8,
+	
+	-- Death Coil
+	[6789] = 3,
+	[17925] = 3,
+	[17926] = 3,
+	[27223] = 3,
 
 	--[[ ROGUES ]]--
 	-- Blind

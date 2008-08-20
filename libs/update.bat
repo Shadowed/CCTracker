@@ -6,6 +6,6 @@ svn export http://dev.wowace.com/wowace/trunk/Ace3/AceGUI-3.0 --force
 svn export http://dev.wowace.com/wowace/trunk/Ace3/AceConfig-3.0 --force
 svn export http://dev.wowace.com/wowace/trunk/Ace3/CallbackHandler-1.0 --force
 svn export http://dev.wowace.com/wowace/trunk/AceGUI-3.0-SharedMediaWidgets --force
-svn export http://shadowed-wow.googlecode.com/svn/trunk/GTB --force
+svn export http://shadowed-wow.googlecode.com/svn/trunk/GTB-1.0 --force
 svn export http://shadowed-wow.googlecode.com/svn/trunk/DRData-1.0 --force
 @PAUSE

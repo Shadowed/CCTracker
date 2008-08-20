@@ -14,15 +14,31 @@ local DR_RESET_TIME = 16
 function CCTracker:OnInitialize()
 	self.defaults = {
 		profile = {
-			scale = 1.0,
-			width = 180,
-			redirectTo = "",
-			texture = "BantoBar",
 			showAnchor = false,
 			nameOnly = false,
 			enableSync = true,
 			silent = false,
-			growUp = false,
+			
+			anchors = {
+				["friendly"] = {
+					growUp = false,
+					scale = 1.0,
+					width = 180,
+					maxBars = 50,
+					redirectTo = "",
+					texture = "BantoBar",
+					text = L["CC Tracker (Friendly)"],
+				},
+				["enemy"] = {
+					growUp = false,
+					text = L["CC Tracker (Enemy)"],
+					scale = 1.0,
+					width = 180,
+					maxBars = 50,
+					redirectTo = "",
+					texture = "BantoBar",
+				},
+			},
 			
 			trackTypes = {["enemy"] = true, ["friendly"] = false},
 			disabled = {["enemy"] = {}, ["friendly"] = {}},
@@ -46,8 +62,9 @@ function CCTracker:OnInitialize()
 	self.GTB = GTBLib
 	
 	self.anchors = {}
-	self.anchors.enemy = self:CreateAnchor("CC Tracker (Enemy)")
-	self.anchors.friendly = self:CreateAnchor("CC Tracker (Friendly)")
+	for name, config in pairs(self.anchors) do
+		self.anchors[name] = self:CreateAnchor(config.text, name)
+	end
 	
 	-- Setup DR lib
 	DRLib = LibStub("DRData-1.0")
@@ -96,9 +113,10 @@ function CCTracker:OnEnable()
 end
 
 function CCTracker:OnDisable()
-	self.anchors.friendly:UnregisterAllBars()
-	self.anchors.enemy:UnregisterAllBars()
-
+	for _, group in pairs(self.anchors) do
+		group:UnregisterAllBars()
+	end
+	
 	self:UnregisterAllEvents()
 	
 	self:RegisterEvent("ZONE_CHANGED_NEW_AREA")
@@ -166,13 +184,13 @@ function CCTracker:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 	if( eventType == "SPELL_AURA_APPLIED" ) then
 		if( auraType == "DEBUFF" ) then
 			local isPlayer = bit.band(destFlags, COMBATLOG_OBJECT_TYPE_PLAYER) == COMBATLOG_OBJECT_TYPE_PLAYER or bit.band(destFlags, COMBATLOG_OBJECT_CONTROL_PLAYER) == COMBATLOG_OBJECT_CONTROL_PLAYER
-			local isEnemy = bit.band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE
-			
+
 			if( DRLib:GetSpellCategory(spellID) ) then
 				debuffGained(spellID, destGUID, isPlayer)
 			end
 				
 			if( CCTracker.spells[spellID] ) then
+				local isEnemy = bit.band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE
 				CCTracker:FoundInaccurateTimer(spellID, spellName, destName, destGUID, isPlayer, isEnemy and "enemy" or "friendly")
 			end
 		end
@@ -375,12 +393,14 @@ function CCTracker:Reload()
 	self:OnDisable()
 	self:OnEnable()
 
-	for _, group in pairs(self.anchors) do
-		group:SetScale(self.db.profile.scale)
-		group:SetWidth(self.db.profile.width)
-		group:SetDisplayGroup(self.db.profile.redirectTo ~= "" and self.db.profile.redirectTo or nil)
-		group:SetAnchorVisible(self.db.profile.showAnchor)
-		group:SetBarGrowth(self.db.profile.growUp and "UP" or "DOWN")
+	for name, group in pairs(self.anchors) do
+		local config = self.db.profile.anchors[name]
+		group:SetScale(config.scale)
+		group:SetWidth(config.width)
+		group:SetDisplayGroup(config.redirectTo ~= "" and config.redirectTo or nil)
+		group:SetAnchorVisible(config.showAnchor)
+		group:SetBarGrowth(config.growUp and "UP" or "DOWN")
+		group:SetMAxBars(config.maxBars)
 	end
 end
 
@@ -397,24 +417,28 @@ function CCTracker:OnBarMove(parent, x, y)
 end
 
 function CCTracker:TextureRegistered(event, mediaType, key)
-	if( mediaType == SML.MediaType.STATUSBAR and CCTracker.db.profile.texture == key ) then
-		self.anchors.enemy:SetTexture(SML:Fetch(SML.MediaType.STATUSBAR, self.db.profile.texture))
-		self.anchors.friendly:SetTexture(SML:Fetch(SML.MediaType.STATUSBAR, self.db.profile.texture))
+	if( mediaType == SML.MediaType.STATUSBAR ) then
+		for name, config in pairs(self.db.profile.anchors) do
+			if( self.anchors[name] and config.texture == key ) then
+				self.anchors[name]:SetTexture(SML:Fetch(SML.MediaType.STATUSBAR, config.texture))
+			end
+		end
 	end
 end
 
 -- Create anchor
-function CCTracker:CreateAnchor(name)
-	
+function CCTracker:CreateAnchor(name, type)
+	local config = self.db.profile.anchors[type]
+
 	local group = GTBLib:RegisterGroup(name, SML:Fetch(SML.MediaType.STATUSBAR, self.db.profile.texture))
 	group:RegisterOnMove(self, "OnBarMove")
-	group:SetScale(self.db.profile.scale)
-	group:SetWidth(self.db.profile.width)
-	group:SetDisplayGroup(self.db.profile.redirectTo ~= "" and self.db.profile.redirectTo or nil)
-	group:SetAnchorVisible(self.db.profile.showAnchor)
-	group:SetBarGrowth(self.db.profile.growUp and "UP" or "DOWN")
+	group:SetScale(config.scale)
+	group:SetWidth(config.width)
+	group:SetDisplayGroup(config.redirectTo ~= "" and config.redirectTo or nil)
+	group:SetAnchorVisible(config.showAnchor)
+	group:SetBarGrowth(config.growUp and "UP" or "DOWN")
+	group:SetMAxBars(config.maxBars)
 
-	local type = name == "CC Tracker (Enemy)" and "enemy" or "friendly"
 	if( self.db.profile.position[type] and self.db.profile.position[type].x and self.db.profile.position[type].y ) then
 		group:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", self.db.profile.position[type].x, self.db.profile.position[type].y)
 	end

@@ -16,6 +16,7 @@ CCTrackerLocals = {
 	["Only show trigger name in bars"] = "Only show trigger name in bars",
 	
 	["Bars"] = "Bars",
+	["Anchors"] = "Anchors",
 	
 	["Display scale"] = "Display scale",
 	["How big the actual timers should be."] = "How big the actual timers should be.",
@@ -41,11 +42,16 @@ CCTrackerLocals = {
 	
 	["Syncing"] = "Syncing",
 	
-	["Enemy spells"] = "Enemy spells",
-	["Friendly spells"] = "Friendly spells",
+	["Enemy players"] = "Enemy players",
+	["Friendly players"] = "Friendly players",
 	
+	["Max bars"] = "Max bars",
+	["Maximum number of bars that will be shown in the anchor at the same time."] = "Maximum number of bars that will be shown in the anchor at the same time.",
+
 	["Spells"] = "Spells",
 	["List"] = "List",
+	
+	["Global settings for anchors, any changes made here will modify both the enemy and friendly anchors."] = "Global settings for anchors, any changes made here will modify both the enemy and friendly anchors.",
 	
 	["Lets you choose which timers should be shown if a party member uses them on an enemy."] = "Lets you choose which timers should be shown if a party member uses them on an enemy.",
 	["Lets you choose which timers should be shown if an enemy uses them on a party member."] = "Lets you choose which timers should be shown if an enemy uses them on a party member.",
