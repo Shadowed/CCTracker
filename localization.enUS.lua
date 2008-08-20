@@ -1,6 +1,6 @@
-PartyCCLocals = {
+CCTrackerLocals = {
 	-- Cmd
-	["Party CC Tracker slash commands"] = "Party CC Tracker slash commands",
+	["CC Tracker slash commands"] = "CC Tracker slash commands",
 
 	["- clear - Clears all running timers."] = "- clear - Clears all running timers.",
 	["- ui - Opens the configuration."] = "- ui - Opens the configuration.",
@@ -24,17 +24,15 @@ PartyCCLocals = {
 	["Bar texture"] = "Bar texture",
 
 	["Redirect bars to group"] = "Redirect bars to group",
-	["Group name to redirect bars to, this lets you show Party CC Tracker timers under another addons bar group. Requires the bars to be created using GTB."] = "Group name to redirect bars to, this lets you show Party CC Tracker timers under another addons bar group. Requires the bars to be created using GTB.",
+	["Group name to redirect bars to, this lets you show CC Tracker timers under another addons bar group. Requires the bars to be created using GTB."] = "Group name to redirect bars to, this lets you show CC Tracker timers under another addons bar group. Requires the bars to be created using GTB.",
 
-	["Enable Party CC Tracker inside"] = "Enable Party CC Tracker inside",
+	["Enable CC Tracker inside"] = "Enable CC Tracker inside",
 
-	["Allows you to set what scenario's Party CC Tracker should be enabled inside."] = "Allows you to set what scenario's Party CC Tracker should be enabled inside.",
+	["Allows you to set what scenario's CC Tracker should be enabled inside."] = "Allows you to set what scenario's CC Tracker should be enabled inside.",
 	
 	["Enable timer syncing"] = "Enable timer syncing",
-	["Enables timers syncing with other Party CC Tracker users, also will send syncs of your own CCs."] = "Enables timers syncing with other Party CC Tracker users, also will send syncs of your own CCs.",
-	
-	["Spells which should be enabled and shown as timers."] = "Spells which should be enabled and shown as timers.",
-	
+	["Enables timers syncing with other CC Tracker users, also will send syncs of your own CCs."] = "Enables timers syncing with other CC Tracker users, also will send syncs of your own CCs.",
+		
 	["Silent mode"] = "Silent mode",
 	["Disables all timers, all this does is sync your CCs with other players."] = "Disables all timers, all this does is sync your CCs with other players.",
 	
@@ -43,9 +41,20 @@ PartyCCLocals = {
 	
 	["Syncing"] = "Syncing",
 	
+	["Enemy spells"] = "Enemy spells",
+	["Friendly spells"] = "Friendly spells",
+	
 	["Spells"] = "Spells",
 	["List"] = "List",
-	["Lets you choose which spells should be shown if a party member uses them."] = "Lets you choose which spells should be shown if a party member uses them.",
+	
+	["Lets you choose which timers should be shown if a party member uses them on an enemy."] = "Lets you choose which timers should be shown if a party member uses them on an enemy.",
+	["Lets you choose which timers should be shown if an enemy uses them on a party member."] = "Lets you choose which timers should be shown if an enemy uses them on a party member.",
+	
+	["Timers"] = "Timers",
+	["Enable CC tracking for"] = "Enable CC tracking for",
+	["What player type CC tracking should be used for."] = "What player type CC tracking should be used for.",
+	["Friendly CC (Friendly player being CCed)"] = "Friendly CC (Friendly player being CCed)",
+	["Enemy CC (Enemy player being CCed)"] = "Enemy CC (Enemy player being CCed)",
 	
 	["Enable timers for %s"] = "Enable timers for %s",
 	

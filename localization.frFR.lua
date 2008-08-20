@@ -2,6 +2,6 @@ if( GetLocale() ~= "frFR" ) then
 	return
 end
 
-PartyCCLocals = setmetatable({
+CCTrackerLocals = setmetatable({
 
-}, {__index = PartyCCLocals})
+}, {__index = CCTrackerLocals})

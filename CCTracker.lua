@@ -1,8 +1,8 @@
-PartyCC = LibStub("AceAddon-3.0"):NewAddon("PartyCC", "AceEvent-3.0")
+CCTracker = LibStub("AceAddon-3.0"):NewAddon("CCTracker", "AceEvent-3.0")
 
-local L = PartyCCLocals
+local L = CCTrackerLocals
 
-local SML, GTBLib, GTBGroup, DRLib
+local SML, GTBLib, DRLib
 local instanceType, playerName, playerGUID
 
 local activeTimers = {}
@@ -11,7 +11,7 @@ local activeTimers = {}
 -- timer off of as much as I do when basing a DR timer
 local DR_RESET_TIME = 16
 
-function PartyCC:OnInitialize()
+function CCTracker:OnInitialize()
 	self.defaults = {
 		profile = {
 			scale = 1.0,
@@ -22,16 +22,18 @@ function PartyCC:OnInitialize()
 			nameOnly = false,
 			enableSync = true,
 			silent = false,
-			growUp = true,
+			growUp = false,
 			
-			disabled = {},
+			trackTypes = {["enemy"] = true, ["friendly"] = false},
+			disabled = {["enemy"] = {}, ["friendly"] = {}},
 			spells = {},
+			position = {["enemy"] = {}, ["friendly"] = {}},
 			
-			inside = {["pvp"] = true, ["arena"] = true}
+			inside = {["pvp"] = true, ["arena"] = true},
 		},
 	}
 
-	self.db = LibStub:GetLibrary("AceDB-3.0"):New("PartyCCDB", self.defaults)
+	self.db = LibStub:GetLibrary("AceDB-3.0"):New("CCTrackerDB", self.defaults)
 
 	self.revision = tonumber(string.match("$Revision: 678 $", "(%d+)") or 1)
 
@@ -41,26 +43,17 @@ function PartyCC:OnInitialize()
 
 	-- Setup GTB
 	GTBLib = LibStub:GetLibrary("GTB-1.0")
-	GTBGroup = GTBLib:RegisterGroup("Party CC Tracker", SML:Fetch(SML.MediaType.STATUSBAR, self.db.profile.texture))
-	GTBGroup:RegisterOnMove(self, "OnBarMove")
-	GTBGroup:SetScale(self.db.profile.scale)
-	GTBGroup:SetWidth(self.db.profile.width)
-	GTBGroup:SetDisplayGroup(self.db.profile.redirectTo ~= "" and self.db.profile.redirectTo or nil)
-	GTBGroup:SetAnchorVisible(self.db.profile.showAnchor)
-	GTBGroup:SetBarGrowth(self.db.profile.growUp and "UP" or "DOWN")
-
-	if( self.db.profile.position ) then
-		GTBGroup:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", self.db.profile.position.x, self.db.profile.position.y)
-	end
-	
 	self.GTB = GTBLib
-	self.GTBGroup = GTBGroup
+	
+	self.anchors = {}
+	self.anchors.enemy = self:CreateAnchor("CC Tracker (Enemy)")
+	self.anchors.friendly = self:CreateAnchor("CC Tracker (Friendly)")
 	
 	-- Setup DR lib
 	DRLib = LibStub("DRData-1.0")
 	
 	-- Add our spells to the list for disabling
-	self.spells = PartyCCSpells
+	self.spells = CCTrackerSpells
 	self.spellNames = {}
 	
 	for spellID in pairs(self.spells) do
@@ -76,7 +69,7 @@ function PartyCC:OnInitialize()
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", "ZONE_CHANGED_NEW_AREA")
 end
 
-function PartyCC:OnEnable()
+function CCTracker:OnEnable()
 	local type = select(2, IsInInstance())
 	if( not self.db.profile.inside[type] ) then
 		return
@@ -102,8 +95,9 @@ function PartyCC:OnEnable()
 	end
 end
 
-function PartyCC:OnDisable()
-	GTBGroup:UnregisterAllBars()
+function CCTracker:OnDisable()
+	self.anchors.friendly:UnregisterAllBars()
+	self.anchors.enemy:UnregisterAllBars()
 
 	self:UnregisterAllEvents()
 	
@@ -163,7 +157,7 @@ local COMBATLOG_OBJECT_REACTION_HOSTILE = COMBATLOG_OBJECT_REACTION_HOSTILE
 local COMBATLOG_OBJECT_CONTROL_PLAYER = COMBATLOG_OBJECT_CONTROL_PLAYER
 
 local eventRegistered = {["SPELL_AURA_APPLIED"] = true, ["SPELL_AURA_REMOVED"] = true, ["PARTY_KILL"] = true, ["UNIT_DIED"] = true}
-function PartyCC:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, spellID, spellName, spellSchool, auraType)
+function CCTracker:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, spellID, spellName, spellSchool, auraType)
 	if( not eventRegistered[eventType] ) then
 		return
 	end
@@ -172,13 +166,14 @@ function PartyCC:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, source
 	if( eventType == "SPELL_AURA_APPLIED" ) then
 		if( auraType == "DEBUFF" ) then
 			local isPlayer = bit.band(destFlags, COMBATLOG_OBJECT_TYPE_PLAYER) == COMBATLOG_OBJECT_TYPE_PLAYER or bit.band(destFlags, COMBATLOG_OBJECT_CONTROL_PLAYER) == COMBATLOG_OBJECT_CONTROL_PLAYER
+			local isEnemy = bit.band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE
 			
 			if( DRLib:GetSpellCategory(spellID) ) then
 				debuffGained(spellID, destGUID, isPlayer)
 			end
 				
-			if( PartyCC.spells[spellID] ) then
-				PartyCC:FoundInaccurateTimer(spellID, spellName, destName, destGUID, isPlayer)
+			if( CCTracker.spells[spellID] ) then
+				CCTracker:FoundInaccurateTimer(spellID, spellName, destName, destGUID, isPlayer, isEnemy and "enemy" or "friendly")
 			end
 		end
 	
@@ -187,10 +182,11 @@ function PartyCC:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, source
 		if( auraType == "DEBUFF" ) then
 			if( DRLib:GetSpellCategory(spellID) ) then
 				local isPlayer = bit.band(destFlags, COMBATLOG_OBJECT_TYPE_PLAYER) == COMBATLOG_OBJECT_TYPE_PLAYER or bit.band(destFlags, COMBATLOG_OBJECT_CONTROL_PLAYER) == COMBATLOG_OBJECT_CONTROL_PLAYER
+
 				debuffFaded(spellID, destGUID, isPlayer)
 			end
 		
-			if( PartyCC.spells[spellID] ) then
+			if( CCTracker.spells[spellID] ) then
 				self:DebuffFaded(spellID, destName, destGUID)
 			end
 		end
@@ -204,7 +200,7 @@ end
 -- TIMER TRACKING
 
 -- Unit died, reset our timers on them
-function PartyCC:UnitDied(guid)
+function CCTracker:UnitDied(guid)
 	-- Reset the tracked DRs for this guid
 	if( trackedPlayers[guid] ) then
 		for cat in pairs(trackedPlayers[guid]) do
@@ -216,32 +212,30 @@ function PartyCC:UnitDied(guid)
 	-- Remove all of our timers for this guid
 	if( activeTimers[guid] ) then
 		for _, id in pairs(activeTimers[guid]) do
-			GTBGroup:UnregisterBar(id)
+			self.anchors.enemy:UnregisterBar(id)
+			self.anchors.friendly:UnregisterBar(id)
 		end
 	end
 end
 
 -- Debuff faded
-function PartyCC:DebuffFaded(spellID, destName, destGUID)
+function CCTracker:DebuffFaded(spellID, destName, destGUID)
 	local spellName = GetSpellInfo(spellID)
 	if( activeTimers[destGUID] and activeTimers[destGUID][spellName] ) then
-		GTBGroup:UnregisterBar(activeTimers[destGUID][spellName])
+		self.anchors.enemy:UnregisterBar(activeTimers[destGUID][spellName])
+		self.anchors.friendly:UnregisterBar(activeTimers[destGUID][spellName])
 	end
 end
 
 -- End result of the timer after any calculations needed are done
-function PartyCC:FoundTimer(spellID, spellName, destName, destGUID, duration, timeLeft, isOurs)
-	if( isOurs and self.db.profile.enableSync ) then
-		self:SendMessage(string.format("GAIN:%s,%s,%s,%s,%s,%s", spellID, spellName, destName, destGUID, duration, timeLeft))
-	end
-	
+function CCTracker:FoundTimer(spellID, spellName, destName, destGUID, duration, timeLeft, playerType)
 	-- Don't show any timers if it's silent, or it's not supposed to be enabled
-	if( self.db.profile.silent or self.db.profile.disabled[spellName] ) then
+	if( self.db.profile.silent or self.db.profile.disabled[playerType][spellName] ) then
 		return
 	end
 
 	local icon = select(3, GetSpellInfo(spellID))
-	local id = string.format("pcc:%s:%s", spellName, destGUID)
+	local id = string.format("pcc:%s:%s:%s", playerType, spellName, destGUID)
 	
 	if( not activeTimers[destGUID] ) then
 		activeTimers[destGUID] = {}
@@ -259,16 +253,24 @@ function PartyCC:FoundTimer(spellID, spellName, destName, destGUID, duration, ti
 		text = destName
 	end
 	
-	GTBGroup:RegisterBar(id, text, timeLeft, duration, icon)
+	self.anchors[playerType]:RegisterBar(id, text, timeLeft, duration, icon)
 end
 
 -- Timer was found through UnitDebuff, so don't do any pre-calculations
-function PartyCC:FoundAccurateTimer(spellID, spellName, destName, destGUID, duration, timeLeft)
-	self:FoundTimer(spellID, spellName, destName, destGUID, duration, timeLeft, true)
+function CCTracker:FoundAccurateTimer(spellID, spellName, destName, destGUID, duration, timeLeft)
+	if( self.db.profile.enableSync ) then
+		self:SendMessage(string.format("GAIN:%s,%s,%s,%s,%s,%s", spellID, spellName, destName, destGUID, duration, timeLeft))
+	end
+
+	self:FoundTimer(spellID, spellName, destName, destGUID, duration, timeLeft, "enemy")
 end
 
 -- Timer was found through the combat log, so perform DR checking to get an "accurate" answer
-function PartyCC:FoundInaccurateTimer(spellID, spellName, destName, destGUID, isPlayer)
+function CCTracker:FoundInaccurateTimer(spellID, spellName, destName, destGUID, isPlayer, playerType)
+	if( not self.db.profile.trackTypes[playerType] ) then
+		return
+	end
+	
 	local duration = self.spells[spellID]
 	-- Cap it at 10 seconds if it's a player, or controlled by a player
 	if( isPlayer and duration > 10 ) then
@@ -286,11 +288,11 @@ function PartyCC:FoundInaccurateTimer(spellID, spellName, destName, destGUID, is
 	end
 	
 	-- Send it off
-	self:FoundTimer(spellID, spellName, destName, destGUID, nil, duration * diminished)
+	self:FoundTimer(spellID, spellName, destName, destGUID, nil, duration * diminished, playerType)
 end
 
 -- Check for accurate timers
-function PartyCC:ScanUnit(unit)
+function CCTracker:ScanUnit(unit)
 	if( not UnitExists(unit) ) then return end
 	
 	local destName = UnitName(unit)
@@ -309,24 +311,24 @@ function PartyCC:ScanUnit(unit)
 	end
 end
 
-function PartyCC:UPDATE_MOUSEOVER_UNIT(event)
+function CCTracker:UPDATE_MOUSEOVER_UNIT(event)
 	self:ScanUnit("mouseover")
 end
 
-function PartyCC:PLAYER_FOCUS_CHANGED()
+function CCTracker:PLAYER_FOCUS_CHANGED()
 	self:ScanUnit("focus")
 end
 
-function PartyCC:PLAYER_TARGET_CHANGED(event, unit)
+function CCTracker:PLAYER_TARGET_CHANGED(event, unit)
 	self:ScanUnit("target")
 end
 
-function PartyCC:UNIT_AURA(event, unit)
+function CCTracker:UNIT_AURA(event, unit)
 	self:ScanUnit(unit)
 end
 
 -- Catch syncs
-function PartyCC:CHAT_MSG_ADDON(event, prefix, msg, type, author)
+function CCTracker:CHAT_MSG_ADDON(event, prefix, msg, type, author)
 	if( prefix == "PCCT2" and author ~= playerName ) then
 		local dataType, data = string.match(msg, "([^:]+)%:(.+)")
 		if( dataType == "GAIN" ) then
@@ -336,7 +338,7 @@ function PartyCC:CHAT_MSG_ADDON(event, prefix, msg, type, author)
 end
 
 -- See if we should enable this in this zone
-function PartyCC:ZONE_CHANGED_NEW_AREA()
+function CCTracker:ZONE_CHANGED_NEW_AREA()
 	local type = select(2, IsInInstance())
 
 	if( type ~= instanceType ) then
@@ -351,7 +353,7 @@ function PartyCC:ZONE_CHANGED_NEW_AREA()
 	instanceType = type
 end
 
-function PartyCC:StripServer(text)
+function CCTracker:StripServer(text)
 	local name, server = string.match(text, "(.-)%-(.*)$")
 	if( not name and not server ) then
 		return text
@@ -360,38 +362,62 @@ function PartyCC:StripServer(text)
 	return name
 end
 
-function PartyCC:SendMessage(msg)
+function CCTracker:SendMessage(msg)
 	SendAddonMessage("PCCT2", msg, "RAID")
 end
 
-function PartyCC:Print(msg)
-	DEFAULT_CHAT_FRAME:AddMessage("|cff33ff99PartyCC|r: " .. msg)
+function CCTracker:Print(msg)
+	DEFAULT_CHAT_FRAME:AddMessage("|cff33ff99CCTracker|r: " .. msg)
 end
 
 -- Reload mod
-function PartyCC:Reload()
+function CCTracker:Reload()
 	self:OnDisable()
 	self:OnEnable()
 
-	GTBGroup:SetScale(self.db.profile.scale)
-	GTBGroup:SetWidth(self.db.profile.width)
-	GTBGroup:SetDisplayGroup(self.db.profile.redirectTo ~= "" and self.db.profile.redirectTo or nil)
-	GTBGroup:SetAnchorVisible(self.db.profile.showAnchor)
-	GTBGroup:SetBarGrowth(self.db.profile.growUp and "UP" or "DOWN")
+	for _, group in pairs(self.anchors) do
+		group:SetScale(self.db.profile.scale)
+		group:SetWidth(self.db.profile.width)
+		group:SetDisplayGroup(self.db.profile.redirectTo ~= "" and self.db.profile.redirectTo or nil)
+		group:SetAnchorVisible(self.db.profile.showAnchor)
+		group:SetBarGrowth(self.db.profile.growUp and "UP" or "DOWN")
+	end
 end
 
 -- Manage GTB group
-function PartyCC:OnBarMove(parent, x, y)
-	if( not PartyCC.db.profile.position ) then
-		PartyCC.db.profile.position = {}
+function CCTracker:OnBarMove(parent, x, y)
+	local type = parent.name == "CC Tracker (Enemy)" and "enemy" or "friendly"
+	
+	if( not CCTracker.db.profile.position[type] ) then
+		CCTracker.db.profile.position[type] = {}
 	end
 	
-	PartyCC.db.profile.position.x = x
-	PartyCC.db.profile.position.y = y
+	CCTracker.db.profile.position[type].x = x
+	CCTracker.db.profile.position[type].y = y
 end
 
-function PartyCC:TextureRegistered(event, mediaType, key)
-	if( mediaType == SML.MediaType.STATUSBAR and PartyCC.db.profile.texture == key ) then
-		GTBGroup:SetTexture(SML:Fetch(SML.MediaType.STATUSBAR, self.db.profile.texture))
+function CCTracker:TextureRegistered(event, mediaType, key)
+	if( mediaType == SML.MediaType.STATUSBAR and CCTracker.db.profile.texture == key ) then
+		self.anchors.enemy:SetTexture(SML:Fetch(SML.MediaType.STATUSBAR, self.db.profile.texture))
+		self.anchors.friendly:SetTexture(SML:Fetch(SML.MediaType.STATUSBAR, self.db.profile.texture))
 	end
+end
+
+-- Create anchor
+function CCTracker:CreateAnchor(name)
+	
+	local group = GTBLib:RegisterGroup(name, SML:Fetch(SML.MediaType.STATUSBAR, self.db.profile.texture))
+	group:RegisterOnMove(self, "OnBarMove")
+	group:SetScale(self.db.profile.scale)
+	group:SetWidth(self.db.profile.width)
+	group:SetDisplayGroup(self.db.profile.redirectTo ~= "" and self.db.profile.redirectTo or nil)
+	group:SetAnchorVisible(self.db.profile.showAnchor)
+	group:SetBarGrowth(self.db.profile.growUp and "UP" or "DOWN")
+
+	local type = name == "CC Tracker (Enemy)" and "enemy" or "friendly"
+	if( self.db.profile.position[type] and self.db.profile.position[type].x and self.db.profile.position[type].y ) then
+		group:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", self.db.profile.position[type].x, self.db.profile.position[type].y)
+	end
+	
+	return group
 end

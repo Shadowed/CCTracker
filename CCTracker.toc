@@ -1,9 +1,9 @@
 ## Interface: 20400
-## Title: Party CC Tracker (2)
-## Notes: Tracks party CC timers using both syncing and guessing methods
+## Title: CC Tracker
+## Notes: Tracks CC on you and other party members
 ## Author: Mayen
 ## Version: $Revision: 666 $
-## SavedVariables: PartyCCDB
+## SavedVariables: CCTrackerDB
 ## OptionalDeps: LibStub, GTB, DRData-1.0, Ace3
 
 libs\LibStub\LibStub.lua
@@ -25,5 +25,5 @@ localization.frFR.lua
 localization.zhCN.lua
 
 spellData.lua
-PartyCCTracker2.lua
+CCTracker.lua
 config.lua

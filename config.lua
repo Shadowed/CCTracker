@@ -1,7 +1,7 @@
-if( not PartyCC ) then return end
+if( not CCTracker ) then return end
 
-local Config = PartyCC:NewModule("Config")
-local L = PartyCCLocals
+local Config = CCTracker:NewModule("Config")
+local L = CCTrackerLocals
 
 local SML, registered, options, config, dialog
 
@@ -10,36 +10,40 @@ function Config:OnInitialize()
 	dialog = LibStub("AceConfigDialog-3.0")
 
 	SML = LibStub:GetLibrary("LibSharedMedia-3.0")
-	SML:Register(SML.MediaType.STATUSBAR, "BantoBar", "Interface\\Addons\\PartyCC\\images\\banto")
-	SML:Register(SML.MediaType.STATUSBAR, "Smooth",   "Interface\\Addons\\PartyCC\\images\\smooth")
-	SML:Register(SML.MediaType.STATUSBAR, "Perl",     "Interface\\Addons\\PartyCC\\images\\perl")
-	SML:Register(SML.MediaType.STATUSBAR, "Glaze",    "Interface\\Addons\\PartyCC\\images\\glaze")
-	SML:Register(SML.MediaType.STATUSBAR, "Charcoal", "Interface\\Addons\\PartyCC\\images\\Charcoal")
-	SML:Register(SML.MediaType.STATUSBAR, "Otravi",   "Interface\\Addons\\PartyCC\\images\\otravi")
-	SML:Register(SML.MediaType.STATUSBAR, "Striped",  "Interface\\Addons\\PartyCC\\images\\striped")
-	SML:Register(SML.MediaType.STATUSBAR, "LiteStep", "Interface\\Addons\\PartyCC\\images\\LiteStep")
+	SML:Register(SML.MediaType.STATUSBAR, "BantoBar", "Interface\\Addons\\CCTracker\\images\\banto")
+	SML:Register(SML.MediaType.STATUSBAR, "Smooth",   "Interface\\Addons\\CCTracker\\images\\smooth")
+	SML:Register(SML.MediaType.STATUSBAR, "Perl",     "Interface\\Addons\\CCTracker\\images\\perl")
+	SML:Register(SML.MediaType.STATUSBAR, "Glaze",    "Interface\\Addons\\CCTracker\\images\\glaze")
+	SML:Register(SML.MediaType.STATUSBAR, "Charcoal", "Interface\\Addons\\CCTracker\\images\\Charcoal")
+	SML:Register(SML.MediaType.STATUSBAR, "Otravi",   "Interface\\Addons\\CCTracker\\images\\otravi")
+	SML:Register(SML.MediaType.STATUSBAR, "Striped",  "Interface\\Addons\\CCTracker\\images\\striped")
+	SML:Register(SML.MediaType.STATUSBAR, "LiteStep", "Interface\\Addons\\CCTracker\\images\\LiteStep")
 end
 
 -- GUI
 local function set(info, value)
-	local arg1, arg2 = string.split(".", info.arg)
+	local arg1, arg2, arg3 = string.split(".", info.arg)
 	
-	if( arg2 ) then
-		PartyCC.db.profile[arg1][arg2] = value
+	if( arg3 ) then
+		CCTracker.db.profile[arg1][arg2][arg3] = value
+	elseif( arg2 ) then
+		CCTracker.db.profile[arg1][arg2] = value
 	else
-		PartyCC.db.profile[arg1] = value
+		CCTracker.db.profile[arg1] = value
 	end
 	
-	PartyCC:Reload()
+	CCTracker:Reload()
 end
 
 local function get(info)
-	local arg1, arg2 = string.split(".", info.arg)
+	local arg1, arg2, arg3 = string.split(".", info.arg)
 	
-	if( arg2 ) then
-		return PartyCC.db.profile[arg1][arg2]
+	if( arg3 ) then
+		return CCTracker.db.profile[arg1][arg2][arg3]
+	elseif( arg2 ) then
+		return CCTracker.db.profile[arg1][arg2]
 	else
-		return PartyCC.db.profile[arg1]
+		return CCTracker.db.profile[arg1]
 	end
 end
 
@@ -60,21 +64,21 @@ local function setMulti(info, value, state)
 	local arg1, arg2 = string.split(".", info.arg)
 	
 	if( arg2 ) then
-		PartyCC.db.profile[arg1][arg2][value] = state
+		CCTracker.db.profile[arg1][arg2][value] = state
 	else
-		PartyCC.db.profile[arg1][value] = state
+		CCTracker.db.profile[arg1][value] = state
 	end
 
-	PartyCC:Reload()
+	CCTracker:Reload()
 end
 
 local function getMulti(info, value)
 	local arg1, arg2 = string.split(".", info.arg)
 	
 	if( arg2 ) then
-		return PartyCC.db.profile[arg1][arg2][value]
+		return CCTracker.db.profile[arg1][arg2][value]
 	else
-		return PartyCC.db.profile[arg1][value]
+		return CCTracker.db.profile[arg1][value]
 	end
 end
 
@@ -97,7 +101,7 @@ function Config:GetGroups()
 	for k in pairs(groups) do groups[k] = nil end
 
 	groups[""] = L["None"]
-	for name, data in pairs(PartyCC.GTB:GetGroups()) do
+	for name, data in pairs(CCTracker.GTB:GetGroups()) do
 		groups[name] = name
 	end
 	
@@ -107,10 +111,54 @@ end
 -- General options
 local enabledIn = {["none"] = L["Everywhere else"], ["pvp"] = L["Battlegrounds"], ["arena"] = L["Arenas"], ["raid"] = L["Raid instances"], ["party"] = L["Party instances"]}
 
+-- Disabling spell config
+local function createSpellConfig(type)
+	local config = {
+		type = "group",
+		order = 2,
+		name = "",
+		get = get,
+		set = set,
+		handler = Config,
+		args = {
+			desc = {
+				order = 0,
+				type = "description",
+				name = "",
+			},
+			list = {
+				order = 1,
+				type = "group",
+				inline = true,
+				name = L["List"],
+				args = {},
+			},
+		},
+	}
+
+	-- Load spell list
+	local id = 0
+	for spellName in pairs(CCTracker.db.profile.spells) do
+		id = id + 1
+		
+		config.args.list.args[tostring(id)] = {
+			order = id,
+			type = "toggle",
+			name = spellName,
+			set = reverseSet,
+			get = reverseGet,
+			arg = "disabled." .. type .. "." .. spellName,
+		}
+	end
+	
+	return config
+end
+
+-- General options
 local function loadOptions()
 	options = {}
 	options.type = "group"
-	options.name = "Party CC Tracker"
+	options.name = "CC Tracker"
 	
 	options.args = {}
 	options.args.general = {
@@ -136,6 +184,17 @@ local function loadOptions()
 				width = "full",
 				arg = "nameOnly",
 			},
+			enabled = {
+				order = 1.5,
+				type = "multiselect",
+				name = L["Enable CC tracking for"],
+				desc = L["What player type CC tracking should be used for."],
+				values = {["friendly"] = L["Friendly CC (Friendly player being CCed)"], ["enemy"] = L["Enemy CC (Enemy player being CCed)"]},
+				set = setMulti,
+				get = getMulti,
+				width = "full",
+				arg = "trackTypes"
+			},
 			sync = {
 				order = 2,
 				type = "group",
@@ -146,7 +205,7 @@ local function loadOptions()
 						order = 1,
 						type = "toggle",
 						name = L["Enable timer syncing"],
-						desc = L["Enables timers syncing with other Party CC Tracker users, also will send syncs of your own CCs."],
+						desc = L["Enables timers syncing with other CC Tracker users, also will send syncs of your own CCs."],
 						arg = "enableSync",
 					},
 					silent = {
@@ -184,7 +243,7 @@ local function loadOptions()
 						order = 2,
 						type = "select",
 						name = L["Redirect bars to group"],
-						desc = L["Group name to redirect bars to, this lets you show Party CC Tracker timers under another addons bar group. Requires the bars to be created using GTB."],
+						desc = L["Group name to redirect bars to, this lets you show CC Tracker timers under another addons bar group. Requires the bars to be created using GTB."],
 						values = "GetGroups",
 						arg = "redirectTo",
 					},
@@ -210,8 +269,8 @@ local function loadOptions()
 			enabledIn = {
 				order = 5,
 				type = "multiselect",
-				name = L["Enable Party CC Tracker inside"],
-				desc = L["Allows you to set what scenario's Party CC Tracker should be enabled inside."],
+				name = L["Enable CC Tracker inside"],
+				desc = L["Allows you to set what scenario's CC Tracker should be enabled inside."],
 				values = enabledIn,
 				set = setMulti,
 				get = getMulti,
@@ -221,76 +280,55 @@ local function loadOptions()
 		},
 	}
 	
-	options.args.spells = {
-		type = "group",
-		order = 2,
-		name = L["Spells"],
-		get = get,
-		set = set,
-		handler = Config,
-		args = {
-			desc = {
-				order = 0,
-				type = "description",
-				name = L["Spells which should be enabled and shown as timers."],
-			},
-			list = {
-				order = 1,
-				type = "group",
-				inline = true,
-				name = L["List"],
-				args = {},
-			},
-		},
-	}
+	-- ENEMY SPELLLS
+	options.args.enemySpells = createSpellConfig("enemy")
+	options.args.enemySpells.order = 2
+	options.args.enemySpells.name = L["Enemy spells"]
+	options.args.enemySpells.args.desc.name = L["Lets you choose which timers should be shown if a party member uses them on an enemy."]
+	
+	-- FRIENDLY SPELLLS
+	options.args.friendlySpells = createSpellConfig("friendly")
+	options.args.friendlySpells.order = 3
+	options.args.friendlySpells.name = L["Friendly spells"]
+	options.args.friendlySpells.args.desc.name = L["Lets you choose which timers should be shown if an enemy uses them on a party member."]
 
-	-- Load spell list
-	local id = 0
-	for spellName in pairs(PartyCC.db.profile.spells) do
-		id = id + 1
-		
-		options.args.spells.args.list.args[tostring(id)] = {
-			order = id,
-			type = "toggle",
-			name = spellName,
-			set = reverseSet,
-			get = reverseGet,
-			arg = "disabled." .. spellName,
-		}
-	end
 
 	-- DB Profiles
-	options.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(PartyCC.db)
-	options.args.profile.order = 3
+	options.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(CCTracker.db)
+	options.args.profile.order = 4
 end
 
 -- Slash commands
-SLASH_PARTYCCTRACKER1 = "/partycc"
-SLASH_PARTYCCTRACKER2 = "/pcc"
-SlashCmdList["PARTYCCTRACKER"] = function(msg)
+SLASH_CCTRACKER1 = "/cctracker"
+SLASH_CCTRACKER2 = "/cct"
+SlashCmdList["CCTRACKER"] = function(msg)
 	if( msg == "clear" ) then
-		PartyCC.GTBGroup:UnregisterAllBars()
+		for _, group in pairs(CCTracker.anchors) do
+			group:UnregisterAllBars()
+		end
 	elseif( msg == "test" ) then
-		local GTBGroup = PartyCC.GTBGroup
-		GTBGroup:UnregisterAllBars()
-		GTBGroup:SetTexture(SML:Fetch(SML.MediaType.STATUSBAR, PartyCC.db.profile.texture))
-		GTBGroup:RegisterBar("pcc1", string.format("%s - %s", (select(1, GetSpellInfo(10890))), UnitName("player")), 10, nil, (select(3, GetSpellInfo(10890))))
-		GTBGroup:RegisterBar("pcc2", string.format("%s - %s", (select(1, GetSpellInfo(26989))), UnitName("player")), 15, nil, (select(3, GetSpellInfo(26989))))
-		GTBGroup:RegisterBar("pcc3", string.format("%s - %s", (select(1, GetSpellInfo(33786))), UnitName("player")), 20, nil, (select(3, GetSpellInfo(33786))))
+		for _, group in pairs(CCTracker.anchors) do
+			group:UnregisterAllBars()
+			group:SetTexture(SML:Fetch(SML.MediaType.STATUSBAR, CCTracker.db.profile.texture))
+			group:RegisterBar("pcc1", string.format("%s - %s", (select(1, GetSpellInfo(10890))), UnitName("player")), 10, nil, (select(3, GetSpellInfo(10890))))
+			group:RegisterBar("pcc2", string.format("%s - %s", (select(1, GetSpellInfo(26989))), UnitName("player")), 15, nil, (select(3, GetSpellInfo(26989))))
+			group:RegisterBar("pcc3", string.format("%s - %s", (select(1, GetSpellInfo(33786))), UnitName("player")), 20, nil, (select(3, GetSpellInfo(33786))))
+		end
+		
 	elseif( msg == "ui" ) then
 		if( not registered ) then
 			if( not options ) then
 				loadOptions()
 			end
 			
-			config:RegisterOptionsTable("PartyCC", options)
-			dialog:SetDefaultSize("PartyCC", 625, 500)
+			config:RegisterOptionsTable("CCTracker", options)
+			dialog:SetDefaultSize("CCTracker", 625, 500)
 			registered = true
 		end
 
-		dialog:Open("PartyCC")
+		dialog:Open("CCTracker")
 	else
-		DEFAULT_CHAT_FRAME:AddMessage(L["Party CC Tracker slash commands"])
+		DEFAULT_CHAT_FRAME:AddMessage(L["CC Tracker slash commands"])
 		DEFAULT_CHAT_FRAME:AddMessage(L["- clear - Clears all running timers."])
 		DEFAULT_CHAT_FRAME:AddMessage(L["- test - Shows test timers."])
 		DEFAULT_CHAT_FRAME:AddMessage(L["- ui - Opens the configuration."])
@@ -303,23 +341,23 @@ register:SetScript("OnShow", function(self)
 	self:SetScript("OnShow", nil)
 	loadOptions()
 
-	config:RegisterOptionsTable("PartyCC-Bliz", {
-		name = "PartyCC",
+	config:RegisterOptionsTable("CCTracker-Bliz", {
+		name = "CCTracker",
 		type = "group",
 		args = {
 			help = {
 				type = "description",
-				name = string.format("Party CC Tracker r%d is a diminishing returns tracker for PvP", PartyCC.revision or 0),
+				name = string.format("CC Tracker r%d is a diminishing returns tracker for PvP", CCTracker.revision or 0),
 			},
 		},
 	})
 	
-	dialog:SetDefaultSize("PartyCC-Bliz", 600, 400)
-	dialog:AddToBlizOptions("PartyCC-Bliz", "PartyCC")
+	dialog:SetDefaultSize("CCTracker-Bliz", 600, 400)
+	dialog:AddToBlizOptions("CCTracker-Bliz", "CCTracker")
 	
-	config:RegisterOptionsTable("PartyCC-General", options.args.general)
-	dialog:AddToBlizOptions("PartyCC-General", options.args.general.name, "PartyCC")
+	config:RegisterOptionsTable("CCTracker-General", options.args.general)
+	dialog:AddToBlizOptions("CCTracker-General", options.args.general.name, "CCTracker")
 
-	config:RegisterOptionsTable("PartyCC-Profile", options.args.profile)
-	dialog:AddToBlizOptions("PartyCC-Profile", options.args.profile.name, "PartyCC")
+	config:RegisterOptionsTable("CCTracker-Profile", options.args.profile)
+	dialog:AddToBlizOptions("CCTracker-Profile", options.args.profile.name, "CCTracker")
 end)

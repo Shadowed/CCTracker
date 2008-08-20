@@ -1,4 +1,4 @@
-PartyCCSpells = {
+CCTrackerSpells = {
 	--[[ PRIESTS ]]--
 	-- Shackle Undead
 	[9484] = 30,
