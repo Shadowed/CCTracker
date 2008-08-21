@@ -248,7 +248,7 @@ local function loadOptions()
 		set = set,
 		handler = Config,
 		args = {
-			enabled = {
+			anchor = {
 				order = 0,
 				type = "toggle",
 				name = L["Show anchor"],

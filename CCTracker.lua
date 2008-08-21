@@ -277,7 +277,7 @@ end
 -- Timer was found through UnitDebuff, so don't do any pre-calculations
 function CCTracker:FoundAccurateTimer(spellID, spellName, destName, destGUID, duration, timeLeft)
 	if( self.db.profile.enableSync ) then
-		self:SendMessage(string.format("GAIN:%s,%s,%s,%s,%s,%s", spellID, spellName, destName, destGUID, duration, timeLeft))
+		self:SendMessage(string.format("GAIN:%s,%s,%s,%s,%s,%s,%s", spellID, spellName, destName, destGUID, duration, timeLeft, "enemy"))
 	end
 
 	self:FoundTimer(spellID, spellName, destName, destGUID, duration, timeLeft, "enemy")
@@ -350,7 +350,8 @@ function CCTracker:CHAT_MSG_ADDON(event, prefix, msg, type, author)
 	if( prefix == "PCCT2" and author ~= playerName ) then
 		local dataType, data = string.match(msg, "([^:]+)%:(.+)")
 		if( dataType == "GAIN" ) then
-			self:FoundTimer(string.split(",", data))
+			local spellID, spellName, destName, destGUID, duration, timeLeft, playerType = string.split(",", data)
+			self:FoundTimer(spellID, spellName, destName, destGUID, duration, timeLeft, playerType or "enemy")
 		end
 	end
 end
@@ -398,9 +399,9 @@ function CCTracker:Reload()
 		group:SetScale(config.scale)
 		group:SetWidth(config.width)
 		group:SetDisplayGroup(config.redirectTo ~= "" and config.redirectTo or nil)
-		group:SetAnchorVisible(config.showAnchor)
+		group:SetAnchorVisible(self.db.profile.showAnchor)
 		group:SetBarGrowth(config.growUp and "UP" or "DOWN")
-		group:SetMAxBars(config.maxBars)
+		group:SetMaxBars(config.maxBars)
 	end
 end
 
@@ -435,7 +436,7 @@ function CCTracker:CreateAnchor(name, type)
 	group:SetScale(config.scale)
 	group:SetWidth(config.width)
 	group:SetDisplayGroup(config.redirectTo ~= "" and config.redirectTo or nil)
-	group:SetAnchorVisible(config.showAnchor)
+	group:SetAnchorVisible(self.db.profile.showAnchor)
 	group:SetBarGrowth(config.growUp and "UP" or "DOWN")
 	group:SetMaxBars(config.maxBars)
 

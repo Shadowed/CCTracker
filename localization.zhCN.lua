@@ -22,6 +22,7 @@ PartyCCLocals = {
 	["Only show trigger name in bars"] = "计时条内仅显示触发名字",
 	
 	["Bars"] = "计时条",
+	["Anchors"] = "锚点",
 	
 	["Display scale"] = "显示缩放",
 	["How big the actual timers should be."] = "计时器缩放.",
@@ -39,16 +40,33 @@ PartyCCLocals = {
 	["Enable timer syncing"] = "启用计时器同步",
 	["Enables timers syncing with other Party CC Tracker users, also will send syncs of your own CCs."] = "和其他使用Party CC Tracker插件的用户同步计时器.",
 	
-	["Spells which should be enabled and shown as timers."] = "启用和显示计时器的法术.",
-	
 	["Silent mode"] = "沉默模式",
 	["Disables all timers, all this does is sync your CCs with other players."] = "禁止与其他用户同步计时器.",
 	
+	["Grow display up"] = "向上增长",
+	["Instead of adding everything from top to bottom, timers will be shown from bottom to top."] = "计时条向上增长叠加.",
+
 	["Syncing"] = "同步",
+
+	["Enemy players"] = "敌对玩家",
+	["Friendly players"] = "友方玩家",
+
+	["Max bars"] = "计时条上限",
+	["Maximum number of bars that will be shown in the anchor at the same time."] = "设置同一时间显示的计时条数量的上限.",
 	
 	["Spells"] = "法术列表",
 	["List"] = "列表",
-	["Lets you choose which spells should be shown if a party member uses them."] = "选择你需要监视的团队成员使用的法术.",
+
+	["Global settings for anchors, any changes made here will modify both the enemy and friendly anchors."] = "锚点的全局设定，任何改动都将影响到敌对和玩家锚点的设置.",
+
+	["Lets you choose which timers should be shown if a party member uses them on an enemy."] = "选择你需要监视的友方玩家使用的法术.",
+	["Lets you choose which timers should be shown if an enemy uses them on a party member."] = "选择你需要监视的敌对玩家使用的法术.",
+
+	["Timers"] = "计时条",
+	["Enable CC tracking for"] = "启用CC tracking",
+	["What player type CC tracking should be used for."] = "选择需要监视的玩家类型.",
+	["Friendly CC (Friendly player being CCed)"] = "友方 (友方玩家被法术控制)",
+	["Enemy CC (Enemy player being CCed)"] = "敌对 (敌对玩家被法术控制)",
 	
 	["Enable timers for %s"] = "启用 %s 的计时器",
 	
