@@ -62,7 +62,7 @@ function CCTracker:OnInitialize()
 	self.GTB = GTBLib
 	
 	self.anchors = {}
-	for name, config in pairs(self.anchors) do
+	for name, config in pairs(self.db.profile.anchors) do
 		self.anchors[name] = self:CreateAnchor(config.text, name)
 	end
 	
