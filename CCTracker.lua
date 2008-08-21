@@ -27,11 +27,11 @@ function CCTracker:OnInitialize()
 					maxBars = 50,
 					redirectTo = "",
 					texture = "BantoBar",
-					text = L["CC Tracker (Friendly)"],
+					text = "CC Tracker (Friendly)",
 				},
 				["enemy"] = {
 					growUp = false,
-					text = L["CC Tracker (Enemy)"],
+					text = "CC Tracker (Enemy)",
 					scale = 1.0,
 					width = 180,
 					maxBars = 50,
@@ -430,14 +430,14 @@ end
 function CCTracker:CreateAnchor(name, type)
 	local config = self.db.profile.anchors[type]
 
-	local group = GTBLib:RegisterGroup(name, SML:Fetch(SML.MediaType.STATUSBAR, self.db.profile.texture))
+	local group = GTBLib:RegisterGroup(name, SML:Fetch(SML.MediaType.STATUSBAR, config.texture))
 	group:RegisterOnMove(self, "OnBarMove")
 	group:SetScale(config.scale)
 	group:SetWidth(config.width)
 	group:SetDisplayGroup(config.redirectTo ~= "" and config.redirectTo or nil)
 	group:SetAnchorVisible(config.showAnchor)
 	group:SetBarGrowth(config.growUp and "UP" or "DOWN")
-	group:SetMAxBars(config.maxBars)
+	group:SetMaxBars(config.maxBars)
 
 	if( self.db.profile.position[type] and self.db.profile.position[type].x and self.db.profile.position[type].y ) then
 		group:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", self.db.profile.position[type].x, self.db.profile.position[type].y)
