@@ -35,6 +35,7 @@ function CCTracker:OnInitialize()
 					scale = 1.0,
 					width = 180,
 					maxBars = 50,
+					texture = "BantoBar",
 					redirectTo = "",
 					texture = "BantoBar",
 				},
@@ -351,7 +352,7 @@ function CCTracker:CHAT_MSG_ADDON(event, prefix, msg, type, author)
 		local dataType, data = string.match(msg, "([^:]+)%:(.+)")
 		if( dataType == "GAIN" ) then
 			local spellID, spellName, destName, destGUID, duration, timeLeft, playerType = string.split(",", data)
-			self:FoundTimer(spellID, spellName, destName, destGUID, duration, timeLeft, playerType or "enemy")
+			self:FoundTimer(spellID, spellName, destName, destGUID, tonumber(duration), tonumber(timeLeft), playerType or "enemy")
 		end
 	end
 end
@@ -419,9 +420,9 @@ end
 
 function CCTracker:TextureRegistered(event, mediaType, key)
 	if( mediaType == SML.MediaType.STATUSBAR ) then
-		for name, config in pairs(self.db.profile.anchors) do
-			if( self.anchors[name] and config.texture == key ) then
-				self.anchors[name]:SetTexture(SML:Fetch(SML.MediaType.STATUSBAR, config.texture))
+		for name, config in pairs(CCTracker.db.profile.anchors) do
+			if( CCTracker.anchors[name] and config.texture == key ) then
+				CCTracker.anchors[name]:SetTexture(SML:Fetch(SML.MediaType.STATUSBAR, config.texture))
 			end
 		end
 	end
