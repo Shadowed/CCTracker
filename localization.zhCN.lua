@@ -4,9 +4,9 @@ if( GetLocale() ~= "zhCN" ) then
 	return
 end
 
-PartyCCLocals = {
+CCTrackerLocals = setmetatable({
 	-- Cmd
-	["Party CC Tracker slash commands"] = "Party CC Tracker命令行",
+	["CC Tracker slash commands"] = "CC Tracker命令行",
 
 	["- clear - Clears all running timers."] = "- clear - 清除所有运行的计时器.",
 	["- ui - Opens the configuration."] = "- ui - 打开配置窗口.",
@@ -33,9 +33,9 @@ PartyCCLocals = {
 	["Redirect bars to group"] = "重定向计时条到组",
 	["Group name to redirect bars to, this lets you show Party CC Tracker timers under another addons bar group. Requires the bars to be created using GTB."] = "重定向Party CC Tracker计时条到其他插件的计时条组.",
 
-	["Enable Party CC Tracker inside"] = "在以下情况启用",
+	["Enable CC Tracker inside"] = "在以下情况启用",
 
-	["Allows you to set what scenario's Party CC Tracker should be enabled inside."] = "允许你选择在什么情况下启用Party CC Tracker.",
+	["Allows you to set what scenario's CC Tracker should be enabled inside."] = "允许你选择在什么情况下启用Party CC Tracker.",
 	
 	["Enable timer syncing"] = "启用计时器同步",
 	["Enables timers syncing with other Party CC Tracker users, also will send syncs of your own CCs."] = "和其他使用Party CC Tracker插件的用户同步计时器.",
@@ -75,7 +75,5 @@ PartyCCLocals = {
 	["Arenas"] = "竞技场",
 	["Raid instances"] = "团队副本",
 	["Party instances"] = "小队副本",
-}
-PartyCCLocals = setmetatable({
 
-}, {__index = PartyCCLocals})
+}, {__index = CCTrackerLocals})

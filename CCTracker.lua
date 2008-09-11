@@ -43,8 +43,8 @@ function CCTracker:OnInitialize()
 			
 			trackTypes = {["enemy"] = true, ["friendly"] = false},
 			disabled = {["enemy"] = {}, ["friendly"] = {}},
-			spells = {},
 			position = {["enemy"] = {}, ["friendly"] = {}},
+			spells = {},
 			
 			inside = {["pvp"] = true, ["arena"] = true},
 		},
@@ -190,7 +190,7 @@ function CCTracker:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 				debuffGained(spellID, destGUID, isPlayer)
 			end
 				
-			if( CCTracker.spells[spellID] ) then
+			if( CCTracker.spells[spellID] and CCTracker.spells[spellID] > 0 ) then
 				local isEnemy = bit.band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE
 				CCTracker:FoundInaccurateTimer(spellID, spellName, destName, destGUID, isPlayer, isEnemy and "enemy" or "friendly")
 			end
@@ -252,7 +252,7 @@ function CCTracker:FoundTimer(spellID, spellName, destName, destGUID, duration, 
 	if( self.db.profile.silent or self.db.profile.disabled[playerType][spellName] ) then
 		return
 	end
-
+	
 	local icon = select(3, GetSpellInfo(spellID))
 	local id = string.format("pcc:%s:%s:%s", playerType, spellName, destGUID)
 	

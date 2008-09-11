@@ -94,4 +94,25 @@ CCTrackerSpells = {
 	[6770] = 25,
 	[2070] = 35,
 	[11297] = 45,
+	
+	--[[ Spells which are only tracked through debuffs ]]--
+	-- Cheap Shot
+	[408] = 0,
+	
+	-- Kidney Shot
+	[8643] = 0,
+	
+	-- Gouge
+	[1776] = 0,
+	
+	-- Pounce
+	[9005] = 0,
+	[9823] = 0,
+	[9827] = 0,
+	[27006] = 0,
+	--[49803] = 0,
+	
+	-- Maim
+	[22570] = 0,
+	--[49802] = 0,
 }
