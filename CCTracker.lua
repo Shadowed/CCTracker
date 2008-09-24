@@ -431,7 +431,7 @@ end
 -- Create anchor
 function CCTracker:CreateAnchor(name, type)
 	local config = self.db.profile.anchors[type]
-
+	
 	local group = GTBLib:RegisterGroup(name, SML:Fetch(SML.MediaType.STATUSBAR, config.texture))
 	group:RegisterOnMove(self, "OnBarMove")
 	group:SetScale(config.scale)

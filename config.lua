@@ -189,7 +189,7 @@ local function createBarConfig(type)
 				type = "select",
 				name = L["Bar texture"],
 				values = "GetTextures",
-				dialogControl = 'LSM30_Statusbar',
+				dialogControl = "LSM30_Statusbar",
 				arg = "anchors." .. type .. ".texture",
 			},
 			location = {
@@ -372,7 +372,6 @@ SlashCmdList["CCTRACKER"] = function(msg)
 	elseif( msg == "test" ) then
 		for _, group in pairs(CCTracker.anchors) do
 			group:UnregisterAllBars()
-			group:SetTexture(SML:Fetch(SML.MediaType.STATUSBAR, CCTracker.db.profile.texture))
 			group:RegisterBar("pcc1", string.format("%s - %s", (select(1, GetSpellInfo(10890))), UnitName("player")), 10, nil, (select(3, GetSpellInfo(10890))))
 			group:RegisterBar("pcc2", string.format("%s - %s", (select(1, GetSpellInfo(26989))), UnitName("player")), 15, nil, (select(3, GetSpellInfo(26989))))
 			group:RegisterBar("pcc3", string.format("%s - %s", (select(1, GetSpellInfo(33786))), UnitName("player")), 20, nil, (select(3, GetSpellInfo(33786))))
