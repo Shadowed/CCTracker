@@ -276,8 +276,8 @@ function CCTracker:FoundTimer(spellID, spellName, destName, destGUID, duration, 
 end
 
 -- Timer was found through UnitDebuff, so don't do any pre-calculations
-function CCTracker:FoundAccurateTimer(spellID, spellName, destName, destGUID, duration, timeLeft)
-	if( self.db.profile.enableSync ) then
+function CCTracker:FoundAccurateTimer(spellID, spellName, destName, destGUID, duration, timeLeft, isMine)
+	if( self.db.profile.enableSync and isMine ) then
 		self:SendMessage(string.format("GAIN:%s,%s,%s,%s,%s,%s,%s", spellID, spellName, destName, destGUID, duration, timeLeft, "enemy"))
 	end
 
@@ -312,20 +312,18 @@ end
 
 -- Check for accurate timers
 function CCTracker:ScanUnit(unit)
-	if( not UnitExists(unit) ) then return end
-	
 	local destName = UnitName(unit)
 	local destGUID = UnitGUID(unit)
 
 	local id = 0
 	while( true ) do
 		id = id + 1
-		local name, rank, texture, _, _, startSeconds, timeLeft = UnitDebuff(unit, id)
+		local name, rank, _, _, _, duration, endTime, isMine = UnitDebuff(unit, id)
 		if( not name ) then break end
 
 		local spellID = self.spellNames[name .. (rank or "")]
-		if( startSeconds and timeLeft and spellID ) then
-			self:FoundAccurateTimer(spellID, name, destName, destGUID, startSeconds, timeLeft)
+		if( duration and endTime and spellID ) then
+			self:FoundAccurateTimer(spellID, name, destName, destGUID, duration, endTime - GetTime(), isMine)
 		end
 	end
 end
