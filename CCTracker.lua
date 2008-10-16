@@ -312,13 +312,17 @@ end
 
 -- Check for accurate timers
 function CCTracker:ScanUnit(unit)
+	if( not UnitIsEnemy(unit) or not UnitCanAttack("player", unit) ) then
+		return
+	end
+	
 	local destName = UnitName(unit)
 	local destGUID = UnitGUID(unit)
 
 	local id = 0
 	while( true ) do
 		id = id + 1
-		local name, rank, _, _, _, duration, endTime, isMine = UnitDebuff(unit, id)
+		local name, rank, texture, count, debuffType, duration, endTime, isMine, isStealable = UnitBuff(unit, id)
 		if( not name ) then break end
 
 		local spellID = self.spellNames[name .. (rank or "")]
