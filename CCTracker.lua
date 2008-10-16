@@ -312,7 +312,7 @@ end
 
 -- Check for accurate timers
 function CCTracker:ScanUnit(unit)
-	if( not UnitIsEnemy(unit) or not UnitCanAttack("player", unit) ) then
+	if( not UnitIsEnemy("player", unit) or not UnitCanAttack("player", unit) ) then
 		return
 	end
 	
