@@ -1,5 +1,8 @@
---[[ $Id: AceDB-3.0.lua 667 2008-06-11 14:34:58Z nevcairiel $ ]]
-local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 8
+--- AceDB-3.0 allows you to create profiles and smart default values for the SavedVariables of your addon.
+-- @class file
+-- @name AceDB-3.0
+-- @release $Id: AceDB-3.0.lua 717 2009-01-04 10:29:29Z nevcairiel $
+local ACEDB_MAJOR, ACEDB_MINOR = "AceDB-3.0", 9
 local AceDB, oldminor = LibStub:NewLibrary(ACEDB_MAJOR, ACEDB_MINOR)
 
 if not AceDB then return end -- No upgrade needed
@@ -354,6 +357,9 @@ function DBObjectLib:SetProfile(name)
 	
 	local oldProfile = self.profile
 	local defaults = self.defaults and self.defaults.profile
+	
+	-- Callback: OnProfileShutdown, database
+	self.callbacks:Fire("OnProfileShutdown", self)
 	
 	if oldProfile and defaults then
 		-- Remove the defaults from the old profile

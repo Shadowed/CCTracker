@@ -1,4 +1,5 @@
---[[ $Id: AceAddon-3.0.lua 654 2008-05-21 13:43:29Z ammo $ ]]
+--- AceAddon-3.0 provides a template for creating addon objects.
+-- @release $Id: AceAddon-3.0.lua 725 2009-01-04 18:53:40Z nevcairiel $
 local MAJOR, MINOR = "AceAddon-3.0", 5
 local AceAddon, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
