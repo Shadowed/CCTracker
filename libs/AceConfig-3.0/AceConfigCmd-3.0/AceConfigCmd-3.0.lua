@@ -1,7 +1,7 @@
 --- AceConfigCmd-3.0 handles access to optionstable through the "command line" interface via the ChatFrames.
 -- @class file
 -- @name AceConfigCmd-3.0
--- @release $Id: AceConfigCmd-3.0.lua 710 2008-12-19 10:14:39Z nevcairiel $
+-- @release $Id: AceConfigCmd-3.0.lua 733 2009-02-03 22:24:44Z nevcairiel $
 
 --[[
 AceConfigCmd-3.0
@@ -17,7 +17,7 @@ REQUIRES: AceConsole-3.0 for command registration (loaded on demand)
 -- TODO: plugin args
 
 
-local MAJOR, MINOR = "AceConfigCmd-3.0", 6
+local MAJOR, MINOR = "AceConfigCmd-3.0", 7
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not lib then return end
@@ -222,7 +222,7 @@ local function showhelp(info, inputpos, tab, noHead)
 			if v.type == "group" and pickfirstset(v.cmdInline, v.inline, false) then
 				print("  "..(desc or name)..":")
 				showhelp(info, inputpos, v, true)
-			else
+			elseif v.type ~= "description" and v.type ~= "header" then
 				print("  |cffffff78"..k.."|r - "..(desc or name or ""))
 			end
 		end

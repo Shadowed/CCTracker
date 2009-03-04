@@ -9,23 +9,11 @@ CCTrackerLocals = {
 	-- GUI
 	["None"] = "None",
 	["General"] = "General",
-		
-	["Show anchor"] = "Show anchor",
-	["Display timer anchors for moving around."] = "Display timer anchor for moving around.",
-	
+			
 	["Only show trigger name in bars"] = "Only show trigger name in bars",
 	
 	["Bars"] = "Bars",
 	["Anchors"] = "Anchors",
-	
-	["Display scale"] = "Display scale",
-	["How big the actual timers should be."] = "How big the actual timers should be.",
-		
-	["Bar width"] = "Bar width",
-	["Bar texture"] = "Bar texture",
-
-	["Redirect bars to group"] = "Redirect bars to group",
-	["Group name to redirect bars to, this lets you show CC Tracker timers under another addons bar group. Requires the bars to be created using GTB."] = "Group name to redirect bars to, this lets you show CC Tracker timers under another addons bar group. Requires the bars to be created using GTB.",
 
 	["Enable CC Tracker inside"] = "Enable CC Tracker inside",
 
@@ -37,16 +25,10 @@ CCTrackerLocals = {
 	["Silent mode"] = "Silent mode",
 	["Disables all timers, all this does is sync your CCs with other players."] = "Disables all timers, all this does is sync your CCs with other players.",
 	
-	["Grow display up"] = "Grow display up",
-	["Instead of adding everything from top to bottom, timers will be shown from bottom to top."] = "Instead of adding everything from top to bottom, timers will be shown from bottom to top.",
-	
 	["Syncing"] = "Syncing",
 	
 	["Enemy players"] = "Enemy players",
 	["Friendly players"] = "Friendly players",
-	
-	["Max bars"] = "Max bars",
-	["Maximum number of bars that will be shown in the anchor at the same time."] = "Maximum number of bars that will be shown in the anchor at the same time.",
 
 	["Spells"] = "Spells",
 	["List"] = "List",
@@ -69,4 +51,34 @@ CCTrackerLocals = {
 	["Arenas"] = "Arenas",
 	["Raid instances"] = "Raid instances",
 	["Party instances"] = "Party instances",
+
+
+	["Grow display up"] = "Grow display up",
+	["Instead of adding everything from top to bottom, timers will be shown from bottom to top."] = "Instead of adding everything from top to bottom, timers will be shown from bottom to top.",
+
+	["Redirect bars to group"] = "Redirect bars to group",
+	["Group name to redirect bars to, this lets you show the mods timers under another addons bar group. Requires the bars to be created using GTB."] = "Group name to redirect bars to, this lets you show the mods timers under another addons bar group. Requires the bars to be created using GTB.",
+
+	["Show anchor"] = "Show anchor",
+	["Display timer anchors for moving around."] = "Display timer anchor for moving around.",
+
+	["Display scale"] = "Display scale",
+	["Max timers"] = "Max timers",
+	["Icon position"] = "Icon position",
+	["Left"] = "Left",
+	["Right"] = "Right",
+	["Bar display"] = "Bar display",
+	
+	["Bar color"] = "Bar color",
+	
+	["Fade time"] = "Fade time",
+	
+	["Texture"] = "Texture",
+	["Width"] = "Width",
+	["Color"] = "Color",
+	
+	["Font"] = "Font",
+	["None"] = "None",
+	["Text"] = "Text",
+	["Size"] = "Size",
 }

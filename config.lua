@@ -22,82 +22,75 @@ end
 
 -- GUI
 local function set(info, value)
-	local arg1, arg2, arg3 = string.split(".", info.arg)
-	
-	-- Global setting, update all the args
-	if( arg3 and arg2 == "global" ) then
-		for name in pairs(CCTracker.db.profile.anchors) do
-			CCTracker.db.profile[arg1][name][arg3] = value
+	if( info.arg ) then
+		local cat, subCat, key = string.split(".", info.arg)
+		key = key or info[#(info)]
+
+		if( subCat == "global" ) then
+			
+			for name in pairs(CCTracker.db.profile.anchors) do
+				CCTracker.db.profile[cat][name][key] = value
+			end
+			
+			CCTracker:Reload()
+			return
 		end
 		
-		CCTracker:Reload()
-		return
-	end
-	
-	if( arg3 ) then
-		CCTracker.db.profile[arg1][arg2][arg3] = value
-	elseif( arg2 ) then
-		CCTracker.db.profile[arg1][arg2] = value
+		CCTracker.db.profile[cat][subCat][key] = value
 	else
-		CCTracker.db.profile[arg1] = value
+		CCTracker.db.profile[info[(#info)]] = value
 	end
 	
 	CCTracker:Reload()
 end
 
 local function get(info)
-	local arg1, arg2, arg3 = string.split(".", info.arg)
-	
-	-- Just grab the options out of another anchor, chances are if you've done global settings
-	-- it'll be the same.
-	if( arg3 and arg2 == "global" ) then
-		return CCTracker.db.profile[arg1].friendly[arg3]
+	if( info.arg ) then
+		local cat, subCat, key = string.split(".", info.arg)
+		key = key or info[#(info)]
+
+		if( subCat == "global" ) then
+			return CCTracker.db.profile[cat].friendly[key]
+		end
+		
+		return CCTracker.db.profile[cat][subCat][key]
 	end
-	
-	if( arg3 ) then
-		return CCTracker.db.profile[arg1][arg2][arg3]
-	elseif( arg2 ) then
-		return CCTracker.db.profile[arg1][arg2]
-	else
-		return CCTracker.db.profile[arg1]
-	end
-end
 
-local function reverseSet(info, value)
-	set(info, not value)
+	return CCTracker.db.profile[info[(#info)]]
 end
-
-local function reverseGet(info)
-	return not get(info)
-end
-
 
 local function setNumber(info, value)
 	set(info, tonumber(value))
 end
 
-local function setMulti(info, value, state)
-	local arg1, arg2 = string.split(".", info.arg)
-	
-	if( arg2 ) then
-		CCTracker.db.profile[arg1][arg2][value] = state
-	else
-		CCTracker.db.profile[arg1][value] = state
-	end
-
+local function setMulti(info, state, value)
+	CCTracker.db.profile[info[(#info)]][state] = value
 	CCTracker:Reload()
 end
 
-local function getMulti(info, value)
-	local arg1, arg2 = string.split(".", info.arg)
-	
-	if( arg2 ) then
-		return CCTracker.db.profile[arg1][arg2][value]
-	else
-		return CCTracker.db.profile[arg1][value]
-	end
+local function getMulti(info, state)
+	return CCTracker.db.profile[info[(#info)]][state]
 end
 
+local function reverseSet(info, value)
+	return set(info, not value)
+end
+
+local function reverseGet(info, value)
+	return not get(info)
+end
+
+-- Return all fonts
+local fonts = {}
+function Config:GetFonts()
+	for k in pairs(fonts) do fonts[k] = nil end
+
+	for _, name in pairs(SML:List(SML.MediaType.FONT)) do
+		fonts[name] = name
+	end
+	
+	return fonts
+end
 
 -- Return all registered SML textures
 local textures = {}
@@ -176,56 +169,108 @@ local function createBarConfig(type)
 		type = "group",
 		name = L["Anchors"],
 		args = {
-			growUp = {
-				order = 1,
-				type = "toggle",
-				name = L["Grow display up"],
-				desc = L["Instead of adding everything from top to bottom, timers will be shown from bottom to top."],
-				width = "full",
-				arg = "anchors." .. type .. ".growUp",
-			},
-			texture = {
+			bar = {
 				order = 2,
-				type = "select",
-				name = L["Bar texture"],
-				values = "GetTextures",
-				dialogControl = "LSM30_Statusbar",
-				arg = "anchors." .. type .. ".texture",
+				type = "group",
+				inline = true,
+				name = L["Bar display"],
+				args = {
+					growUp = {
+						order = 1,
+						type = "toggle",
+						name = L["Grow display up"],
+						desc = L["Instead of adding everything from top to bottom, timers will be shown from bottom to top."],
+						arg = "anchors." .. type,
+						width = "full",
+					},
+					sep = {
+						order = 3,
+						name = "",
+						type = "description",
+					},
+					redirectTo = {
+						order = 8,
+						type = "select",
+						name = L["Redirect bars to group"],
+						desc = L["Group name to redirect bars to, this lets you show the mods timers under another addons bar group. Requires the bars to be created using GTB."],
+						arg = "anchors." .. type,
+						values = "GetGroups",
+						width = "full",
+					},
+					icon = {
+						order = 5,
+						type = "select",
+						name = L["Icon position"],
+						values = {["LEFT"] = L["Left"], ["RIGHT"] = L["Right"]},
+						arg = "anchors." .. type,
+					},
+					texture = {
+						order = 6,
+						type = "select",
+						name = L["Texture"],
+						dialogControl = "LSM30_Statusbar",
+						arg = "anchors." .. type,
+						values = "GetTextures",
+					},
+					sep = {
+						order = 8,
+						name = "",
+						type = "description",
+					},
+					fadeTime = {
+						order = 9,
+						type = "range",
+						name = L["Fade time"],
+						arg = "anchors." .. type,
+						min = 0, max = 2, step = 0.1,
+					},
+					scale = {
+						order = 11,
+						type = "range",
+						name = L["Display scale"],
+						arg = "anchors." .. type,
+						min = 0, max = 2, step = 0.01,
+					},
+					maxRows = {
+						order = 12,
+						type = "range",
+						name = L["Max timers"],
+						arg = "anchors." .. type,
+						min = 1, max = 100, step = 1,
+					},
+					width = {
+						order = 13,
+						type = "range",
+						name = L["Width"],
+						min = 50, max = 300, step = 1,
+						set = setNumber,
+						arg = "anchors." .. type,
+					},
+				},
 			},
-			location = {
+			text = {
 				order = 3,
-				type = "select",
-				name = L["Redirect bars to group"],
-				desc = L["Group name to redirect bars to, this lets you show CC Tracker timers under another addons bar group. Requires the bars to be created using GTB."],
-				values = "GetGroups",
-				arg = "anchors." .. type .. ".redirectTo",
-			},
-			scale = {
-				order = 4,
-				type = "range",
-				name = L["Display scale"],
-				desc = L["How big the actual timers should be."],
-				min = 0, max = 2, step = 0.1,
-				set = setNumber,
-				arg = "anchors." .. type .. ".scale",
-				width = "full",
-			},
-			maxBars = {
-				order = 5,
-				type = "range",
-				name = L["Max bars"],
-				desc = L["Maximum number of bars that will be shown in the anchor at the same time."],
-				min = 0, max = 50, step = 1,
-				set = setNumber,
-				arg = "anchors." .. type .. ".maxBars",
-			},
-			width = {
-				order = 7,
-				type = "range",
-				name = L["Bar width"],
-				min = 0, max = 300, step = 1,
-				set = setNumber,
-				arg = "anchors." .. type .. ".width",
+				type = "group",
+				inline = true,
+				name = L["Text"],
+				args = {
+					fontSize = {
+						order = 1,
+						type = "range",
+						name = L["Size"],
+						min = 1, max = 20, step = 1,
+						set = setNumber,
+						arg = "anchors." .. type,
+					},
+					fontName = {
+						order = 2,
+						type = "select",
+						name = L["Font"],
+						dialogControl = "LSM30_Font",
+						values = "GetFonts",
+						arg = "anchors." .. type,
+					},
+				},
 			},
 		},
 	}
@@ -248,23 +293,21 @@ local function loadOptions()
 		set = set,
 		handler = Config,
 		args = {
-			anchor = {
+			showAnchor = {
 				order = 0,
 				type = "toggle",
 				name = L["Show anchor"],
 				desc = L["Display timer anchor for moving around."],
 				width = "full",
-				arg = "showAnchor",
 			},
 			nameOnly = {
-				order = 1,
+				order = 1.1,
 				type = "toggle",
 				name = L["Only show trigger name in bars"],
 				width = "full",
-				arg = "nameOnly",
 			},
-			enabled = {
-				order = 1.5,
+			trackTypes = {
+				order = 1.2,
 				type = "multiselect",
 				name = L["Enable CC tracking for"],
 				desc = L["What player type CC tracking should be used for."],
@@ -272,33 +315,29 @@ local function loadOptions()
 				set = setMulti,
 				get = getMulti,
 				width = "full",
-				arg = "trackTypes"
 			},
 			sync = {
-				order = 2,
+				order = 1.3,
 				type = "group",
 				inline = true,
 				name = L["Syncing"],
 				args = {
-					enabled = {
+					enableSync = {
 						order = 1,
 						type = "toggle",
 						name = L["Enable timer syncing"],
 						desc = L["Enables timers syncing with other CC Tracker users, also will send syncs of your own CCs."],
-						arg = "enableSync",
 					},
 					silent = {
 						order = 2,
 						type = "toggle",
 						name = L["Silent mode"],
 						desc = L["Disables all timers, and just syncs your CCs to other players."],
-						arg = "silent",
 					},
 				},
 			},
-			bars = createBarConfig("global"),
-			enabledIn = {
-				order = 5,
+			inside = {
+				order = 1.4,
 				type = "multiselect",
 				name = L["Enable CC Tracker inside"],
 				desc = L["Allows you to set what scenario's CC Tracker should be enabled inside."],
@@ -306,8 +345,8 @@ local function loadOptions()
 				set = setMulti,
 				get = getMulti,
 				width = "full",
-				arg = "inside"
 			},
+			bars = createBarConfig("global"),
 		},
 	}
 	
@@ -384,7 +423,7 @@ SlashCmdList["CCTRACKER"] = function(msg)
 			end
 			
 			config:RegisterOptionsTable("CCTracker", options)
-			dialog:SetDefaultSize("CCTracker", 625, 500)
+			dialog:SetDefaultSize("CCTracker", 650, 525)
 			registered = true
 		end
 

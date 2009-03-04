@@ -24,20 +24,27 @@ function CCTracker:OnInitialize()
 					growUp = false,
 					scale = 1.0,
 					width = 180,
-					maxBars = 50,
+					maxRows = 30,
+					fontSize = 12,
+					fadeTime = 0.5,
 					redirectTo = "",
+					icon = "LEFT",
+					fontName = "Friz Quadrata TT",
 					texture = "BantoBar",
 					text = "CC Tracker (Friendly)",
 				},
 				["enemy"] = {
 					growUp = false,
-					text = "CC Tracker (Enemy)",
 					scale = 1.0,
 					width = 180,
-					maxBars = 50,
-					texture = "BantoBar",
+					maxRows = 30,
+					fontSize = 12,
+					fadeTime = 0.5,
 					redirectTo = "",
+					icon = "LEFT",
+					fontName = "Friz Quadrata TT",
 					texture = "BantoBar",
+					text = "CC Tracker (Enemy)",
 				},
 			},
 			
@@ -52,11 +59,11 @@ function CCTracker:OnInitialize()
 
 	self.db = LibStub:GetLibrary("AceDB-3.0"):New("CCTrackerDB", self.defaults)
 
-	self.revision = tonumber(string.match("$Revision: 678 $", "(%d+)") or 1)
+	self.revision = tonumber(string.match("$Revision$", "(%d+)") or 1)
 
 	-- Setup SML
 	SML = LibStub:GetLibrary("LibSharedMedia-3.0")
-	SML.RegisterCallback(self, "LibSharedMedia_Registered", "TextureRegistered")
+	SML.RegisterCallback(self, "LibSharedMedia_Registered", "MediaRegistered")
 
 	-- Setup GTB
 	GTBLib = LibStub:GetLibrary("GTB-1.0")
@@ -105,7 +112,7 @@ function CCTracker:OnEnable()
 	if( not self.db.profile.silent ) then
 		-- Silent mode doesn't require the combat log for DR tracking
 		self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-
+				
 		-- Enable syncing
 		if( self.db.profile.enableSync ) then
 			self:RegisterEvent("CHAT_MSG_ADDON")
@@ -114,10 +121,6 @@ function CCTracker:OnEnable()
 end
 
 function CCTracker:OnDisable()
-	for _, group in pairs(self.anchors) do
-		group:UnregisterAllBars()
-	end
-	
 	self:UnregisterAllEvents()
 	
 	self:RegisterEvent("ZONE_CHANGED_NEW_AREA")
@@ -182,32 +185,27 @@ function CCTracker:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 	end
 	
 	-- Enemy gained a debuff
-	if( eventType == "SPELL_AURA_APPLIED" ) then
-		if( auraType == "DEBUFF" ) then
-			local isPlayer = bit.band(destFlags, COMBATLOG_OBJECT_TYPE_PLAYER) == COMBATLOG_OBJECT_TYPE_PLAYER or bit.band(destFlags, COMBATLOG_OBJECT_CONTROL_PLAYER) == COMBATLOG_OBJECT_CONTROL_PLAYER
-
-			if( DRLib:GetSpellCategory(spellID) ) then
-				debuffGained(spellID, destGUID, isPlayer)
-			end
-				
-			if( CCTracker.spells[spellID] and CCTracker.spells[spellID] > 0 ) then
-				local isEnemy = bit.band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE
-				CCTracker:FoundInaccurateTimer(spellID, spellName, destName, destGUID, isPlayer, isEnemy and "enemy" or "friendly")
-			end
+	if( eventType == "SPELL_AURA_APPLIED" and auraType == "DEBUFF" ) then
+		local isPlayer = bit.band(destFlags, COMBATLOG_OBJECT_TYPE_PLAYER) == COMBATLOG_OBJECT_TYPE_PLAYER or bit.band(destFlags, COMBATLOG_OBJECT_CONTROL_PLAYER) == COMBATLOG_OBJECT_CONTROL_PLAYER
+		if( DRLib:GetSpellCategory(spellID) ) then
+			debuffGained(spellID, destGUID, isPlayer)
+		end
+		
+		if( CCTracker.spells[spellID] and CCTracker.spells[spellID] > 0 ) then
+			local isEnemy = bit.band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE
+			CCTracker:FoundInaccurateTimer(spellID, spellName, destName, destGUID, isPlayer, isEnemy and "enemy" or "friendly")
 		end
 	
 	-- Debuff faded from an enemy
-	elseif( eventType == "SPELL_AURA_REMOVED" ) then
-		if( auraType == "DEBUFF" ) then
-			if( DRLib:GetSpellCategory(spellID) ) then
-				local isPlayer = bit.band(destFlags, COMBATLOG_OBJECT_TYPE_PLAYER) == COMBATLOG_OBJECT_TYPE_PLAYER or bit.band(destFlags, COMBATLOG_OBJECT_CONTROL_PLAYER) == COMBATLOG_OBJECT_CONTROL_PLAYER
+	elseif( eventType == "SPELL_AURA_REMOVED" and auraType == "DEBUFF" ) then
+		if( DRLib:GetSpellCategory(spellID) ) then
+			local isPlayer = bit.band(destFlags, COMBATLOG_OBJECT_TYPE_PLAYER) == COMBATLOG_OBJECT_TYPE_PLAYER or bit.band(destFlags, COMBATLOG_OBJECT_CONTROL_PLAYER) == COMBATLOG_OBJECT_CONTROL_PLAYER
 
-				debuffFaded(spellID, destGUID, isPlayer)
-			end
-		
-			if( CCTracker.spells[spellID] ) then
-				self:DebuffFaded(spellID, destName, destGUID)
-			end
+			debuffFaded(spellID, destGUID, isPlayer)
+		end
+
+		if( CCTracker.spells[spellID] ) then
+			self:DebuffFaded(spellID, destName, destGUID)
 		end
 		
 	-- Don't use UNIT_DIED inside arenas due to accuracy issues, outside of arenas we don't care too much
@@ -368,6 +366,10 @@ function CCTracker:ZONE_CHANGED_NEW_AREA()
 		if( self.db.profile.inside[type] ) then
 			self:OnEnable()
 		else
+			for _, group in pairs(self.anchors) do
+				group:UnregisterAllBars()
+			end
+
 			self:OnDisable()
 		end
 	end
@@ -404,7 +406,11 @@ function CCTracker:Reload()
 		group:SetDisplayGroup(config.redirectTo ~= "" and config.redirectTo or nil)
 		group:SetAnchorVisible(self.db.profile.showAnchor)
 		group:SetBarGrowth(config.growUp and "UP" or "DOWN")
-		group:SetMaxBars(config.maxBars)
+		group:SetMaxBars(config.maxRows)
+		group:SetFont(SML:Fetch(SML.MediaType.FONT, config.fontName), config.fontSize)
+		group:SetTexture(SML:Fetch(SML.MediaType.STATUSBAR, config.texture))
+		group:SetFadeTime(config.fadeTime)
+		group:SetIconPosition(config.icon)
 	end
 end
 
@@ -420,11 +426,17 @@ function CCTracker:OnBarMove(parent, x, y)
 	CCTracker.db.profile.position[type].y = y
 end
 
-function CCTracker:TextureRegistered(event, mediaType, key)
+function CCTracker:MediaRegistered(event, mediaType, key)
 	if( mediaType == SML.MediaType.STATUSBAR ) then
 		for name, config in pairs(CCTracker.db.profile.anchors) do
 			if( CCTracker.anchors[name] and config.texture == key ) then
 				CCTracker.anchors[name]:SetTexture(SML:Fetch(SML.MediaType.STATUSBAR, config.texture))
+			end
+		end
+	elseif( mediaType == SML.MediaType.FONT ) then
+		for name, config in pairs(CCTracker.db.profile.anchors) do
+			if( CCTracker.anchors[name] and config.fontName == key ) then
+				GTBGroup:SetFont(SML:Fetch(SML.MediaType.FONT, self.db.profile.fontName), self.db.profile.fontSize)
 			end
 		end
 	end
@@ -441,7 +453,11 @@ function CCTracker:CreateAnchor(name, type)
 	group:SetDisplayGroup(config.redirectTo ~= "" and config.redirectTo or nil)
 	group:SetAnchorVisible(self.db.profile.showAnchor)
 	group:SetBarGrowth(config.growUp and "UP" or "DOWN")
-	group:SetMaxBars(config.maxBars)
+	group:SetMaxBars(config.maxRows)
+	group:SetFont(SML:Fetch(SML.MediaType.FONT, config.fontName), config.fontSize)
+	group:SetTexture(SML:Fetch(SML.MediaType.STATUSBAR, config.texture))
+	group:SetFadeTime(config.fadeTime)
+	group:SetIconPosition(config.icon)
 
 	if( self.db.profile.position[type] and self.db.profile.position[type].x and self.db.profile.position[type].y ) then
 		group:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", self.db.profile.position[type].x, self.db.profile.position[type].y)

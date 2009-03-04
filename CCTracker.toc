@@ -2,7 +2,7 @@
 ## Title: CC Tracker
 ## Notes: Tracks CC on you and other party members
 ## Author: Mayen
-## Version: $Revision: 666 $
+## Version: $Revision$
 ## SavedVariables: CCTrackerDB
 ## OptionalDeps: LibStub, GTB-1.0, DRData-1.0, Ace3
 
