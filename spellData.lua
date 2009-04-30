@@ -137,3 +137,18 @@ CCTrackerSpells = {
 	[22570] = 0,
 	[49802] = 0,
 }
+
+-- Spells that cap at 6 seconds, not 10 in PVP
+CCTrackerCaps = {
+	-- Wyvern sting
+	[19386] = 6,
+	[24132] = 6,
+	[24133] = 6,
+	[27068] = 6,
+	[49011] = 6,
+	[49012] = 6,
+	
+	-- Banish
+	[710] = 6,
+	[18647] = 6,
+}

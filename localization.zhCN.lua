@@ -15,44 +15,26 @@ CCTrackerLocals = setmetatable({
 	-- GUI
 	["None"] = "无",
 	["General"] = "常规选项",
-		
-	["Show anchor"] = "显示锚点",
-	["Display timer anchors for moving around."] = "显示计时器锚点以拖动.",
 	
 	["Only show trigger name in bars"] = "计时条内仅显示触发名字",
 	
 	["Bars"] = "计时条",
 	["Anchors"] = "锚点",
-	
-	["Display scale"] = "显示缩放",
-	["How big the actual timers should be."] = "计时器缩放.",
-		
-	["Bar width"] = "条宽",
-	["Bar texture"] = "材质",
-
-	["Redirect bars to group"] = "重定向计时条到组",
-	["Group name to redirect bars to, this lets you show Party CC Tracker timers under another addons bar group. Requires the bars to be created using GTB."] = "重定向Party CC Tracker计时条到其他插件的计时条组.",
 
 	["Enable CC Tracker inside"] = "在以下情况启用",
 
 	["Allows you to set what scenario's CC Tracker should be enabled inside."] = "允许你选择在什么情况下启用Party CC Tracker.",
 	
 	["Enable timer syncing"] = "启用计时器同步",
-	["Enables timers syncing with other Party CC Tracker users, also will send syncs of your own CCs."] = "和其他使用Party CC Tracker插件的用户同步计时器.",
+	["Enables timers syncing with other CC Tracker users, also will send syncs of your own CCs."] = "和其他使用Party CC Tracker插件的用户同步计时器.",
 	
 	["Silent mode"] = "沉默模式",
 	["Disables all timers, all this does is sync your CCs with other players."] = "禁止与其他用户同步计时器.",
-	
-	["Grow display up"] = "向上增长",
-	["Instead of adding everything from top to bottom, timers will be shown from bottom to top."] = "计时条向上增长叠加.",
 
 	["Syncing"] = "同步",
 
 	["Enemy players"] = "敌对玩家",
 	["Friendly players"] = "友方玩家",
-
-	["Max bars"] = "计时条上限",
-	["Maximum number of bars that will be shown in the anchor at the same time."] = "设置同一时间显示的计时条数量的上限.",
 	
 	["Spells"] = "法术列表",
 	["List"] = "列表",
@@ -76,4 +58,32 @@ CCTrackerLocals = setmetatable({
 	["Raid instances"] = "团队副本",
 	["Party instances"] = "小队副本",
 
+	["Grow display up"] = "向上增长",
+	["Instead of adding everything from top to bottom, timers will be shown from bottom to top."] = "计时条向上增长叠加.",
+
+	["Redirect bars to group"] = "重定向计时条到组",
+	["Group name to redirect bars to, this lets you show the mods timers under another addons bar group. Requires the bars to be created using GTB."] = "重定向Party CC Tracker计时条到其他插件的计时条组.",
+
+	["Show anchor"] = "显示锚点",
+	["Display timer anchors for moving around."] = "显示计时器锚点以拖动.",
+
+	["Display scale"] = "显示缩放",
+	["Max timers"] = "计时条上限",
+	["Icon position"] = "图标位置",
+	["Left"] = "左",
+	["Right"] = "右",
+	["Bar display"] = "计时条显示",
+
+	["Bar color"] = "计时条颜色",
+
+	["Fade time"] = "渐隐时间",
+	
+	["Texture"] = "材质",
+	["Width"] = "宽",
+	["Color"] = "颜色",
+	
+	["Font"] = "字体",
+	["None"] = "无",
+	["Text"] = "文字",
+	["Size"] = "大小",
 }, {__index = CCTrackerLocals})

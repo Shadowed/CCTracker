@@ -78,6 +78,7 @@ function CCTracker:OnInitialize()
 	DRLib = LibStub("DRData-1.0")
 	
 	-- Add our spells to the list for disabling
+	self.spellCap = CCTrackerCaps
 	self.spells = CCTrackerSpells
 	self.spellNames = {}
 	
@@ -291,7 +292,7 @@ function CCTracker:FoundInaccurateTimer(spellID, spellName, destName, destGUID, 
 	local duration = self.spells[spellID]
 	-- Cap it at 10 seconds if it's a player, or controlled by a player
 	if( isPlayer and duration > 10 ) then
-		duration = 10
+		duration = self.spellCap[spellID] or 10
 	end
 	
 	-- Apply any DR
