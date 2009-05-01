@@ -437,7 +437,7 @@ function CCTracker:MediaRegistered(event, mediaType, key)
 	elseif( mediaType == SML.MediaType.FONT ) then
 		for name, config in pairs(CCTracker.db.profile.anchors) do
 			if( CCTracker.anchors[name] and config.fontName == key ) then
-				GTBGroup:SetFont(SML:Fetch(SML.MediaType.FONT, self.db.profile.fontName), self.db.profile.fontSize)
+				CCTracker.anchors[name]:SetFont(SML:Fetch(SML.MediaType.FONT, self.db.profile.fontName), self.db.profile.fontSize)
 			end
 		end
 	end
