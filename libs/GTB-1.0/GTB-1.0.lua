@@ -1,5 +1,5 @@
 local major = "GTB-1.0"
-local minor = tonumber(string.match("$Revision: 1257 $", "(%d+)") or 1)
+local minor = tonumber(string.match("$Revision$", "(%d+)") or 1)
 
 assert(LibStub, string.format("%s requires LibStub.", major))
 
