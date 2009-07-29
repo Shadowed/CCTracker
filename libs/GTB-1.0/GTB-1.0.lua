@@ -1,6 +1,5 @@
 local major = "GTB-1.0"
-local minor = tonumber(string.match("$Revision$", "(%d+)") or 1)
-
+local minor = 1001
 assert(LibStub, string.format("%s requires LibStub.", major))
 
 local GTB = LibStub:NewLibrary(major, minor)
@@ -96,14 +95,20 @@ local function releaseFrame(frame)
 	table.insert(framePool, frame)	
 end
 
+local function safecall(func, ...)
+	local success, result = pcall(func, ...)
+	if( not success ) then
+		geterrorhandler()(result)
+	end
+end
+
 local function triggerFadeCallback(group, barID)
 	if( type(group.onFadeHandler) == "table" and type(group.onFadeFunc) == "string" ) then
-		group.onFadeHandler[group.onFadeFunc](group.onFadeHandler, barID)			
+		safecall(group.onFadeHandler[group.onFadeFunc], group.onFadeHandler, barID)
 	elseif( type(group.onFadeFunc) == "string" ) then
-		local func = getglobal(group.onFadeFunc)
-		getglobal(group.onFadeFunc)(barID)
+		safecall(getglobal(group.onFadeFunc), barID)
 	elseif( type(group.onFadeFunc) == "function" ) then
-		group.onFadeFunc(barID)
+		safecall(group.onFadeFunc, barID)
 	end
 end
 
@@ -258,11 +263,11 @@ local function OnDragStop(self)
 
 		local group = groups[self.name]
 		if( group.onMoveHandler and group.onMoveFunc ) then
-			group.onMoveHandler[group.onMoveFunc](group.onMoveHandler, self, x, y)			
+			safecall(group.onMoveHandler[group.onMoveFunc], group.onMoveHandler, self, x, y)			
 		elseif( type(group.onMoveFunc) == "string" ) then
-			getglobal(group.onMoveFunc)(self, x, y)
+			safecall(getglobal(group.onMoveFunc), self, x, y)
 		elseif( type(group.onMoveFunc) == "function" ) then
-			group.onMoveFunc(self, x, y)
+			safecall(group.onMoveFunc, self, x, y)
 		end
 	end
 end

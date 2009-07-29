@@ -27,7 +27,6 @@ local function set(info, value)
 		key = key or info[#(info)]
 
 		if( subCat == "global" ) then
-			
 			for name in pairs(CCTracker.db.profile.anchors) do
 				CCTracker.db.profile[cat][name][key] = value
 			end

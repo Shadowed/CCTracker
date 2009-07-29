@@ -2,9 +2,7 @@
 ## Title: CC Tracker
 ## Notes: Tracks CC on you and other party members
 ## Author: Mayen
-## Version: $Revision$
 ## SavedVariables: CCTrackerDB
-## OptionalDeps: LibStub, GTB-1.0, DRData-1.0, Ace3
 
 libs\LibStub\LibStub.lua
 libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
@@ -20,8 +18,6 @@ libs\GTB-1.0\GTB-1.0.xml
 libs\DRData-1.0\DRData-1.0.xml
 
 localization.enUS.lua
-localization.deDE.lua
-localization.frFR.lua
 localization.zhCN.lua
 
 spellData.lua

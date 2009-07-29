@@ -59,8 +59,6 @@ function CCTracker:OnInitialize()
 
 	self.db = LibStub:GetLibrary("AceDB-3.0"):New("CCTrackerDB", self.defaults)
 
-	self.revision = tonumber(string.match("$Revision$", "(%d+)") or 1)
-
 	-- Setup SML
 	SML = LibStub:GetLibrary("LibSharedMedia-3.0")
 	SML.RegisterCallback(self, "LibSharedMedia_Registered", "MediaRegistered")
