@@ -1,7 +1,7 @@
-## Interface: 30100
+## Interface: 30200
 ## Title: CC Tracker
 ## Notes: Tracks CC on you and other party members
-## Author: Mayen
+## Author: Shadowed
 ## SavedVariables: CCTrackerDB
 
 libs\LibStub\LibStub.lua
