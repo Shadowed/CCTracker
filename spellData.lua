@@ -1,4 +1,8 @@
 CCTrackerSpells = {
+	--[[ DEATH KNIGHTS ]]--
+	-- Hungering Cold
+	[49203] = 10,
+
 	--[[ PRIESTS ]]--
 	-- Shackle Undead
 	[9484] = 30,
@@ -10,7 +14,13 @@ CCTrackerSpells = {
 	[8124] = 8,
 	[10888] = 8,
 	[10890] = 8,
+	
+	-- Mind Control
+	[605] = 60,
 
+	-- Psychic Horror
+	[64044] = 3,
+	
 	--[[ DRUIDS ]]--
 	-- Entangling Roots
 	[339] = 12,
@@ -53,6 +63,11 @@ CCTrackerSpells = {
 	[12826] = 50,
 	[61305] = 50,
 	[61025] = 50,
+	[61721] = 50,
+	[61780] = 50,
+	
+	-- Deep Freeze
+	[44572] = 5,
 		
 	--[[ HUNTERS ]]--
 	-- Freezing Trap
@@ -75,6 +90,9 @@ CCTrackerSpells = {
 	[27068] = 12,
 	[49011] = 12,
 	[49012] = 12,
+	
+	-- Scatter Shot
+	[19503] = 4,
 		
 	--[[ WARLOCKS ]]--
 	-- Banish
@@ -148,6 +166,9 @@ CCTrackerCaps = {
 	[49011] = 6,
 	[49012] = 6,
 	
+	-- Repentance
+	[20066] = 6,
+
 	-- Banish
 	[710] = 6,
 	[18647] = 6,
