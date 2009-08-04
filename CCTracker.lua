@@ -190,9 +190,9 @@ function CCTracker:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 			debuffGained(spellID, destGUID, isPlayer)
 		end
 		
-		if( CCTracker.spells[spellID] and CCTracker.spells[spellID] > 0 ) then
+		if( self.spells[spellID] and self.spells[spellID] > 0 ) then
 			local isEnemy = bit.band(destFlags, COMBATLOG_OBJECT_REACTION_HOSTILE) == COMBATLOG_OBJECT_REACTION_HOSTILE
-			CCTracker:FoundInaccurateTimer(spellID, spellName, destName, destGUID, isPlayer, isEnemy and "enemy" or "friendly")
+			self:FoundInaccurateTimer(spellID, spellName, destName, destGUID, isPlayer, isEnemy and "enemy" or "friendly")
 		end
 	
 	-- Debuff faded from an enemy
@@ -203,7 +203,7 @@ function CCTracker:COMBAT_LOG_EVENT_UNFILTERED(event, timestamp, eventType, sour
 			debuffFaded(spellID, destGUID, isPlayer)
 		end
 
-		if( CCTracker.spells[spellID] ) then
+		if( self.spells[spellID] ) then
 			self:DebuffFaded(spellID, destName, destGUID)
 		end
 		
@@ -390,7 +390,7 @@ function CCTracker:SendMessage(msg)
 end
 
 function CCTracker:Print(msg)
-	DEFAULT_CHAT_FRAME:AddMessage("|cff33ff99CCTracker|r: " .. msg)
+	DEFAULT_CHAT_FRAME:AddMessage("|cff33ff99CC Tracker|r: " .. msg)
 end
 
 -- Reload mod
