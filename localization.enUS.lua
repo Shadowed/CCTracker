@@ -48,5 +48,4 @@ CCTrackerLocals = {
 	["Texture"] = "Texture",
 	["What player type CC tracking should be used for."] = "What player type CC tracking should be used for.",
 	["Width"] = "Width",
-
 }
