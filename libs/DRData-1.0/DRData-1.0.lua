@@ -1,5 +1,5 @@
 local major = "DRData-1.0"
-local minor = 1002
+local minor = 1003
 assert(LibStub, string.format("%s requires LibStub.", major))
 
 local Data = LibStub:NewLibrary(major, minor)
@@ -25,6 +25,27 @@ local L = {
 	["Hibernate"] = "Hibernate",
 	["Taunts"] = "Taunts",
 }
+
+if GetLocale() == "frFR" then
+	L["Banish"] = "Bannissement"
+	L["Charge"] = "Charge"
+	L["Cheap Shot"] = "Coup bas"
+	L["Controlled stuns"] = "Etourdissements contrôlés"
+	L["Cyclone"] = "Cyclone"
+	L["Disarms"] = "Désarmements"
+	L["Disorients"] = "Désorientations"
+	L["Entrapment"] = "Piège"
+	L["Fears"] = "Peurs"
+	L["Horrors"] = "Horreurs"
+	L["Mind Control"] = "Contrôle mental"
+	L["Random roots"] = "Immobilisations aléatoires"
+	L["Random stuns"] = "Etourdissemensts aléatoires"
+	L["Controlled roots"] = "Immobilisations contrôlées"
+	L["Scatter Shot"] = "Flèche de dispersion"
+	L["Silences"] = "Silences"
+	L["Hibernate"] = "Hibernation"
+	L["Taunts"] = "Provocations"
+end
 
 -- How long before DR resets
 -- While everyone will tell you it's 15 seconds, it's actually 16 - 20 seconds with 18 being a decent enough average
@@ -344,12 +365,33 @@ Data.spells = {
 	[9853] = "ctrlroot",
 	[26989] = "ctrlroot",
 	[53308] = "ctrlroot",
-
+	
+	-- Nature's Grasp (Uses different spellIDs than Entangling Roots for the same spell)
+	[19970] = "ctrlroot",
+	[19971] = "ctrlroot",
+	[19972] = "ctrlroot",
+	[19973] = "ctrlroot",
+	[19974] = "ctrlroot",
+	[19975] = "ctrlroot",
+	[27010] = "ctrlroot",
+	[53313] = "ctrlroot",
+	
 	-- Earthgrab (Storm, Earth and Fire talent)
 	[8377] = "ctrlroot",
 	[31983] = "ctrlroot",
-	[64965] = "ctrlroot",
 
+	-- Web (Spider)
+	[4167] = "ctrlroot",
+	
+	-- Venom Web Spray (Silithid)
+	[54706] = "ctrlroot",
+	[55505] = "ctrlroot",
+	[55506] = "ctrlroot",
+	[55507] = "ctrlroot",
+	[55508] = "ctrlroot",
+	[55509] = "ctrlroot",
+	
+	
 	--[[ RANDOM ROOTS ]]--
 	-- Improved Hamstring
 	[23694] = "rndroot",
@@ -397,8 +439,6 @@ Data.spells = {
 	
 	-- Mind Control
 	[605] = "mc",
-	[10911] = "mc",
-	[10912] = "mc",
 
 	-- Banish
 	[710] = "banish",
